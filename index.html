@@ -23,9 +23,9 @@
         <div class="auth-line-art" aria-hidden="true"><svg viewBox="0 0 540 170" preserveAspectRatio="xMidYMid meet"><path d="M35 126Q270 181 505 126M35 112Q270 163 505 112M42 99Q270 149 498 99" fill="none" stroke="currentColor" stroke-width="2"/><path d="M72 93V42h45v51M82 53h25M82 65h25M82 77h25M367 86v-45h61v45M367 49h61M374 60h48M374 71h48" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="265" cy="71" r="26" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="240" cy="42" r="13" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="292" cy="42" r="13" fill="none" stroke="currentColor" stroke-width="2"/><ellipse cx="215" cy="16" rx="26" ry="5" fill="none" stroke="currentColor" stroke-width="2"/><ellipse cx="315" cy="14" rx="25" ry="5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M215 21V55M315 19V54M213 42l23 15M316 40l-22 15" fill="none" stroke="currentColor" stroke-width="2"/><path d="M121 98v-30h64v30M128 73h50M136 83h5m7 0h5m7 0h5" fill="none" stroke="currentColor" stroke-width="2"/></svg></div>
       </div>
       <div class="auth-card">
-        <div class="auth-card-top"><span class="version-pill">AMBIENTE DE TESTE · V0.1</span><span class="three-dots">● ● ●</span></div>
-        <h2>Bem-vindo de volta.</h2>
-        <p class="muted">Entre para acessar o laboratório de riders técnicos.</p>
+        <div class="auth-card-top"><span class="version-pill">AMBIENTE DE TESTE · V0.2</span><span class="three-dots">● ● ●</span></div>
+        <h2 id="login-title">Bem-vindo de volta.</h2>
+        <p id="login-description" class="muted">Entre para acessar o laboratório de riders técnicos.</p>
         <form id="login-form" autocomplete="off">
           <label for="login-email">E-mail de acesso</label>
           <div class="login-input"><span>@</span><input id="login-email" type="email" autocomplete="off" required placeholder="seu@email.com" /></div>
@@ -34,7 +34,40 @@
           <p id="login-error" class="error-text" aria-live="polite"></p>
           <button type="submit" class="button primary auth-submit">Entrar na plataforma <span>→</span></button>
         </form>
-        <div class="demo-box"><span class="demo-tag">CREDENCIAIS DEMONSTRATIVAS</span><div><strong>Login</strong><code>demo@ipp.local</code></div><div><strong>Senha</strong><code>IPPdemo2026!</code></div><small>Protótipo público. Não insira senhas reais nem informações confidenciais.</small></div>
+        <button type="button" id="show-register" class="auth-link-button">Não tem uma conta? <strong>Conheça o cadastro →</strong></button>
+        <section id="register-view" class="register-view" aria-labelledby="register-title" hidden>
+          <div id="register-form-step">
+            <h2 id="register-title">Criar uma conta</h2>
+            <p class="muted">Prévia do cadastro de usuário. Nesta etapa, nenhuma conta será criada e nenhuma informação será enviada.</p>
+            <div class="registration-warning" role="note">AMBIENTE DE DEMONSTRAÇÃO · Preencha apenas dados fictícios. Não utilize sua senha real.</div>
+            <form id="register-form" autocomplete="off">
+              <div class="register-field"><label for="register-name">Nome completo</label><input id="register-name" name="name" type="text" required minlength="3" maxlength="100" autocomplete="off" placeholder="Nome de exemplo"></div>
+              <div class="register-field"><label for="register-email">E-mail</label><input id="register-email" name="email" type="email" required maxlength="254" autocomplete="off" placeholder="teste@exemplo.com"></div>
+              <div class="register-field"><label for="register-phone">Telefone com DDD</label><input id="register-phone" name="phone" type="tel" required inputmode="tel" autocomplete="off" placeholder="(11) 90000-0000" maxlength="20"></div>
+              <div class="register-field"><label for="register-password">Senha de teste</label><input id="register-password" name="password" type="password" required minlength="12" maxlength="128" autocomplete="new-password" placeholder="Pelo menos 12 caracteres"></div>
+              <div class="register-field"><label for="register-password-confirm">Repita a senha</label><input id="register-password-confirm" name="passwordConfirm" type="password" required minlength="12" maxlength="128" autocomplete="new-password" placeholder="Repita a senha de teste"></div>
+              <label class="register-acknowledge"><input type="checkbox" id="register-demo-ack" required> <span>Entendo que este cadastro é apenas uma demonstração visual e não cria contas reais.</span></label>
+              <p class="error-text" id="register-error" aria-live="polite"></p>
+              <button class="button primary auth-submit" type="submit">Visualizar etapa de confirmação <span>→</span></button>
+            </form>
+          </div>
+          <div id="register-verification-step" hidden>
+            <div class="verify-icon" aria-hidden="true">✉</div>
+            <h2>Confirmação da conta</h2>
+            <p class="muted">Escolha como deseja receber um código no futuro. Esta é uma prévia do fluxo: nenhum código foi enviado.</p>
+            <div class="registration-warning">SEM BACKEND CONECTADO · O envio por e-mail ou SMS só será ativado após configurarmos autenticação e provedores reais.</div>
+            <fieldset class="verify-method"><legend>Método de confirmação</legend>
+              <label><input type="radio" name="verify-method" value="email" checked> E-mail</label>
+              <label><input type="radio" name="verify-method" value="sms"> SMS no telefone</label>
+            </fieldset>
+            <label for="register-verification-code" class="verify-code-label">Código de 6 dígitos</label>
+            <input id="register-verification-code" type="text" inputmode="numeric" placeholder="Envio ainda não disponível" disabled aria-describedby="verification-preview-note">
+            <p id="verification-preview-note" class="verify-note">Simulação de verificação por e-mail. Nenhum código gerado.</p>
+            <button type="button" id="verification-back" class="button outlined full-button">Voltar ao formulário</button>
+          </div>
+          <button type="button" id="register-back-login" class="auth-link-button">← Voltar ao login de demonstração</button>
+        </section>
+        <div id="demo-box" class="demo-box"><span class="demo-tag">CREDENCIAIS DEMONSTRATIVAS</span><div><strong>Login</strong><code>demo@ipp.local</code></div><div><strong>Senha</strong><code>IPPdemo2026!</code></div><small>Protótipo público. Não insira senhas reais nem informações confidenciais.</small></div>
         <div class="auth-foot"><span>IPP Multimídia</span><span>Som • Luz • Imagem</span></div>
       </div>
     </div>
