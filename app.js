@@ -207,12 +207,12 @@
       event.preventDefault();
       const f=$('register-form'), p=$('register-password').value;
       const confirm=$('register-password-confirm').value;
-      const digits=$('register-phone').value.replace(/\\D/g,'');
+      const digits=$('register-phone').value.replace(/\D/g,'');
       const err=$('register-error');
       err.textContent='';
       if(!f.reportValidity())return;
-      if(!/^\\d{10,11}$/.test(digits) && !/^55\\d{10,11}$/.test(digits)){err.textContent='Informe um telefone brasileiro com DDD (10 ou 11 dígitos).';return;}
-      if(p.length<12||!/[a-zA-Z]/.test(p)||!/\\d/.test(p)){err.textContent='Use uma senha fictícia com no mínimo 12 caracteres, letras e números.';return;}
+      if(!/^\d{10,11}$/.test(digits) && !/^55\d{10,11}$/.test(digits)){err.textContent='Informe um telefone brasileiro com DDD (10 ou 11 dígitos).';return;}
+      if(p.length<12||!/[a-zA-Z]/.test(p)||!/\d/.test(p)){err.textContent='Use uma senha fictícia com no mínimo 12 caracteres, letras e números.';return;}
       if(p!==confirm){err.textContent='As senhas de demonstração não coincidem.';return;}
       // Segurança da prévia: apaga imediatamente todos os dados; nenhuma conta, SMS ou e-mail é criado/enviado.
       f.reset();
