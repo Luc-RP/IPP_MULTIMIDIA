@@ -8,9 +8,9 @@
   const selectors = id => document.getElementById(id);
   const form = selectors('rider-form');
   const definitions = {
-    som: {title:'Rider técnico de som', crumb:'SOM', hero:'SONORIZAÇÃO / BANDA IPP', print:'RIDER DE SOM'},
-    luz: {title:'Rider técnico de luz', crumb:'LUZ', hero:'ILUMINAÇÃO / EQUIPE IPP', print:'RIDER DE LUZ'},
-    imagem: {title:'Rider técnico de imagem', crumb:'IMAGEM', hero:'IMAGEM & VÍDEO / EQUIPE IPP', print:'RIDER DE IMAGEM'}
+    som: {title:'Rider técnico de som', crumb:'SOM', hero:'SONORIZAÇÃO / BANDA / PRODUÇÃO', print:'RIDER DE SOM'},
+    luz: {title:'Rider técnico de luz', crumb:'LUZ', hero:'ILUMINAÇÃO / EQUIPE TÉCNICA', print:'RIDER DE LUZ'},
+    imagem: {title:'Rider técnico de imagem', crumb:'IMAGEM', hero:'IMAGEM & VÍDEO / EQUIPE TÉCNICA', print:'RIDER DE IMAGEM'}
   };
   const starterInstruments = [
     {name:'Violão',qty:1},{name:'Baixo',qty:1},{name:'Teclado',qty:1},{name:'Bateria',qty:1},{name:'Guitarra',qty:1}
@@ -114,6 +114,9 @@
     activeDraftId=null;delete workspaces[activeModule];restore(defaultData(activeModule));$('last-saved').textContent='Ainda não salvo';notify('Novo formulário iniciado.');
   }
   function validate() {
+    if(activeModule==='som' && $('speaker-model').value==='Outro modelo'){
+      $('speaker-model').value=''; notify('Plano Free: escolha uma caixa do catálogo. Modelo personalizado estará no Premium.',true); return false;
+    }
     const name=$('event-name').value.trim();
     if(!name){$('event-name').focus();notify('Informe o nome do evento ou campanha antes de salvar ou exportar.',true);return false;}
     if($('event-type').value==='Vigília' && Number($('year-end').value)<=Number($('year-start').value)){
@@ -211,7 +214,7 @@
       const err=$('register-error');
       err.textContent='';
       if(!f.reportValidity())return;
-      if(!/^\d{10,11}$/.test(digits) && !/^55\d{10,11}$/.test(digits)){err.textContent='Informe um telefone brasileiro com DDD (10 ou 11 dígitos).';return;}
+      if(digits && !/^\d{10,11}$/.test(digits) && !/^55\d{10,11}$/.test(digits)){err.textContent='Informe um telefone brasileiro com DDD (10 ou 11 dígitos).';return;}
       if(p.length<12||!/[a-zA-Z]/.test(p)||!/\d/.test(p)){err.textContent='Use uma senha fictícia com no mínimo 12 caracteres, letras e números.';return;}
       if(p!==confirm){err.textContent='As senhas de demonstração não coincidem.';return;}
       // Segurança da prévia: apaga imediatamente todos os dados; nenhuma conta, SMS ou e-mail é criado/enviado.
