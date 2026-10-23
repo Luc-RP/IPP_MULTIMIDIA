@@ -1,4 +1,4 @@
-/* IPP MULTIMIDIA | Protótipo v0.1.0. Nenhuma autenticacao real ou banco online. */
+/* LK MULTIMIDIA | Site demonstrativo v0.4.0. Sem autenticacao real nem banco online. */
 'use strict';
 (() => {
   const DEMO_EMAIL = 'demo@ipp.local';
@@ -172,7 +172,7 @@
     html+=section(activeModule==='som'?'05':'03','Responsáveis e observações',`<div class="print-pairs">${printedPair('Responsável técnico',d.contactName)}${printedPair('Função',d.contactRole)}${printedPair('E-mail',d.contactEmail)}${printedPair('Telefone',d.contactPhone)}</div>${printedNotes(d.generalNotes)}`);
     const documentTitle=escapeHTML(d.eventName);
     const printRoot=$('print-root');
-    printRoot.innerHTML=`<div class="print-cover"><div><div class="print-over">IGREJA PRÍNCIPE PODEROSO · IPP MULTIMÍDIA</div><h1>RIDER TÉCNICO</h1><h2>${escapeHTML(description.hero)}</h2><div class="print-line"></div><small>${documentTitle} · ${escapeHTML(year)}</small></div><div class="print-logo">IPP</div></div><div class="print-body">${html}<div class="print-bottom"><span>IPP MULTIMÍDIA · ${escapeHTML(description.print)}</span><span>DOCUMENTO GERADO EM ${escapeHTML(new Date().toLocaleDateString('pt-BR'))}</span></div></div>`;
+    printRoot.innerHTML=`<div class="print-cover"><div><div class="print-over">LK MULTIMÍDIA · PRODUÇÃO & COMUNICAÇÃO</div><h1>RIDER TÉCNICO</h1><h2>${escapeHTML(description.hero)}</h2><div class="print-line"></div><small>${documentTitle} · ${escapeHTML(year)}</small></div><div class="print-logo">LK</div></div><div class="print-body">${html}<div class="print-bottom"><span>LK MULTIMÍDIA · ${escapeHTML(description.print)}</span><span>DOCUMENTO GERADO EM ${escapeHTML(new Date().toLocaleDateString('pt-BR'))}</span></div></div>`;
   }
   function printRider() {
     if(!validate())return;
