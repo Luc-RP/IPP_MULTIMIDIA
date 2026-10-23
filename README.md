@@ -1,4 +1,4 @@
-# IPP Multimídia — protótipo v0.1.0
+# IPP Multimídia — protótipo v0.2.0
 
 Primeira versão de demonstração de um site de formulários técnicos para a Igreja Príncipe Poderoso. Identidade visual inspirada no Rider Técnico Banda IPP aprovado em 23/10/2026.
 
@@ -9,7 +9,7 @@ Primeira versão de demonstração de um site de formulários técnicos para a I
 - Projeto estático: abra `index.html` num navegador moderno. Não exige servidor para essa demonstração.
 - A interface é responsiva e preparada para impressão A4 com `window.print()`; para PDF escolha **Salvar como PDF** na caixa de impressão.
 
-## Acesso demo (público e intencional)
+## Cadastro visual (v0.2.0)\n\n- Tela de cadastro com nome, e-mail, telefone, senha e confirmação de senha; validações apenas no navegador.\n- Prévia de escolha do código de confirmação por e-mail ou SMS (campo de código desabilitado).\n- **Nenhuma conta é criada.** Nenhuma senha, telefone ou e-mail é persistido ou enviado. Campos apagados ao avançar. Não utilizar dados reais nesta prévia pública.\n- Para abrir cadastros reais é necessário conectar autenticação gerenciada, provedor SMTP, e para SMS um provedor que normalmente cobra pelo envio, com proteção contra abuso e regras de banco.\n\n## Acesso demo (público e intencional)
 
 - E-mail: `demo@ipp.local`
 - Senha: `IPPdemo2026!`
@@ -40,7 +40,7 @@ Primeira versão de demonstração de um site de formulários técnicos para a I
 
 - O repositório é **público**: todos os arquivos versionados ficam públicos. Nunca commitar senhas reais, tokens, documentos privados ou dados de membros.
 - Conteúdo do formulário é armazenado apenas na máquina local via navegador, não há sincronização nem isolamento entre usuários do mesmo navegador.
-- O projeto **não foi implantado no Vercel nem publicado via GitHub Pages**. GitHub permite ver o código, mas não hospeda a aplicação executável sem habilitar Pages ou outro serviço. Para visualizar a interface, baixe o ZIP e abra `index.html`.
+- O projeto é servido pelo GitHub Pages, no endereço https://luc-rp.github.io/IPP_MULTIMIDIA/. Não foi implantado no Vercel. A página é pública, portanto o login demonstrativo não oferece isolamento ou proteção.
 - A diretiva CSP local desabilita conexões externas e scripts remotos, porém isso **não equivale a segurança de produção**.
 - Futuras etapas: autenticação real, verificação de e-mail, MFA opcional, controle de acesso por usuário e papel, backend e banco de dados, armazenamento de anexos, políticas de retenção, logs, versionamento e compartilhamento entre responsáveis.
 
