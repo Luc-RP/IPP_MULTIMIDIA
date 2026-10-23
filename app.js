@@ -185,6 +185,47 @@
     });
     $('remove-artwork').addEventListener('click',()=>{artworkData='';$('artwork').value='';updateArtwork();});
   }
+  function setupRegistrationPreview() {
+    const screenParts=['login-title','login-description','login-form','show-register','demo-box'];
+    const goTo = screen => {
+      const onLogin=screen==='login';
+      screenParts.forEach(id=>{$(id).hidden=!onLogin;});
+      $('register-view').hidden=onLogin;
+      $('register-form-step').hidden=false;
+      $('register-verification-step').hidden=true;
+      $('register-error').textContent='';
+      if(onLogin)$('register-form').reset();
+    };
+    $('show-register').addEventListener('click',()=>goTo('register'));
+    $('register-back-login').addEventListener('click',()=>goTo('login'));
+    $('verification-back').addEventListener('click',()=>{
+      $('register-form').reset();
+      $('register-form-step').hidden=false;
+      $('register-verification-step').hidden=true;
+    });
+    $('register-form').addEventListener('submit',event=>{
+      event.preventDefault();
+      const f=$('register-form'), p=$('register-password').value;
+      const confirm=$('register-password-confirm').value;
+      const digits=$('register-phone').value.replace(/\\D/g,'');
+      const err=$('register-error');
+      err.textContent='';
+      if(!f.reportValidity())return;
+      if(!/^\\d{10,11}$/.test(digits) && !/^55\\d{10,11}$/.test(digits)){err.textContent='Informe um telefone brasileiro com DDD (10 ou 11 dígitos).';return;}
+      if(p.length<12||!/[a-zA-Z]/.test(p)||!/\\d/.test(p)){err.textContent='Use uma senha fictícia com no mínimo 12 caracteres, letras e números.';return;}
+      if(p!==confirm){err.textContent='As senhas de demonstração não coincidem.';return;}
+      // Segurança da prévia: apaga imediatamente todos os dados; nenhuma conta, SMS ou e-mail é criado/enviado.
+      f.reset();
+      $('register-form-step').hidden=true;
+      $('register-verification-step').hidden=false;
+      $('register-verification-code').value='';
+      $('verification-preview-note').textContent='Simulação de verificação por e-mail. Nenhum código gerado.';
+    });
+    document.querySelectorAll('input[name="verify-method"]').forEach(input=>input.addEventListener('change',()=>{
+      const via=input.value==='sms'?'SMS':'e-mail';
+      $('verification-preview-note').textContent='Simulação de verificação por '+via+'. Nenhum código gerado ou enviado.';
+    }));
+  }
   function login() {
     $('login-form').addEventListener('submit',event=>{
       event.preventDefault();const email=$('login-email').value.trim().toLowerCase(),pass=$('login-password').value;
@@ -211,7 +252,7 @@
     $('event-type').addEventListener('change',updateVigil);
     for(const id of ['event-year','year-start','year-end'])$(id).addEventListener('change',updateVigil);
     form.addEventListener('input',updateSummary);form.addEventListener('change',updateSummary);
-    setupImage();login();$('copyright-year').textContent=String(new Date().getFullYear());
+    setupImage();login();setupRegistrationPreview();$('copyright-year').textContent=String(new Date().getFullYear());
     try{demoSession=sessionStorage.getItem(SESSION_KEY)==='demo';}catch{} if(demoSession)showApp();
   }
   setupListeners();
