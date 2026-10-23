@@ -1,0 +1,184 @@
+/* LK Multimidia | Sistema visual 2026-10-23 v0.4.0
+   Base: identidade visual LK Studio fornecida na pasta compartilhada do Google Drive.
+   Referencias: LKSTUDIO.png, Back.png, Front.png, Logo1.png, LK.png.
+   A marca e monocromatica: preto/carvao, branco/grafite, pontos, diagonais e waveform.
+   A fonte da arte nao foi identificada nominalmente; Montserrat aproxima o estilo geometrico.
+   Manter este arquivo separado para preservar a logica preexistente do site. */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap');
+:root {
+  --navy:#0b0c0e; --navy2:#191a1e; --ink:#17191e; --cyan:#f2f2f2;
+  --cyan-dark:#cdced0; --pale:#f1f1f1; --white:#fff; --paper:#fff;
+  --body:#f5f5f6; --line:#dadadc; --muted:#74767e;
+  --shadow:0 38px 84px rgba(0,0,0,.46);
+  --lk-paper:#fdfdfd; --lk-black:#0a0b0d; --lk-graphite:#17181b;
+  --lk-bright:#f8f8f8; --lk-metal:#bdc0c5; --lk-border:#3e4045;
+}
+html,body,button,input,select,textarea {font-family:'Montserrat',Arial,Helvetica,sans-serif}
+body {background:#0c0c0e;color:#202126}
+button, a, input, select, textarea {transition:background-color .16s ease,border-color .16s ease,box-shadow .16s ease}
+::selection {background:#d5d5d8;color:#09090b}
+:focus-visible {outline-color:#bcbfc2!important}
+.dot {background:#ebebec;box-shadow:0 0 0 4px rgba(250,250,250,.11)}
+.button {border-radius:7px;letter-spacing:.015em}
+.button.primary {background:#f0f0f2;color:#151519;border:1px solid #f3f3f4}
+.button.primary:hover {background:#d9dadd}
+.button.outlined {background:#fbfbfc;border:1px solid #bfc0c5;color:#27282b}
+.button.outlined:hover {background:#ececef}
+.button.cancel {color:#565861}
+.button.cancel:hover {background:#e7e7e9}
+/* Identity accent: abstract poster dot grid, structured diagonals and sound bars. */
+.auth-page {
+  background:
+    radial-gradient(circle at 18% 22%,rgba(128,128,135,.08),transparent 35%),
+    repeating-linear-gradient(137deg,transparent 0 19px,rgba(255,255,255,.014) 20px,transparent 21px),
+    #09090b;
+}
+.auth-page:before {content:'';position:absolute;inset:-10% auto auto -7%;width:min(42vw,580px);height:560px;opacity:.33;pointer-events:none;background-image:radial-gradient(circle,#a6a6aa 2.4px,transparent 3px);background-size:25px 25px;mask-image:linear-gradient(115deg,#000,transparent 82%);-webkit-mask-image:linear-gradient(115deg,#000,transparent 82%)}
+.auth-page:after {content:'';position:absolute;bottom:0;left:0;width:100%;height:75px;opacity:.27;pointer-events:none;background:repeating-linear-gradient(90deg,#bfc0c5 0 3px,transparent 3px 11px);mask-image:linear-gradient(0deg,#000,transparent 88%);-webkit-mask-image:linear-gradient(0deg,#000,transparent 88%)}
+.auth-glow {display:none}
+.auth-shell {max-width:1220px;gap:clamp(30px,6vw,90px);grid-template-columns:minmax(0,1.12fr) minmax(360px,.88fr)}
+.auth-intro {padding-right:26px}
+.identity-lockup {align-items:center;gap:17px;margin-bottom:67px}
+.identity-lockup img {object-fit:contain;width:70px;height:70px;border:1px solid rgba(255,255,255,.19);padding:8px;background:#1a1b1e;border-radius:3px}
+.identity-lockup span {font-size:33px;line-height:.98;letter-spacing:-.06em;font-weight:900}
+.identity-lockup small {font-size:11px;color:#c7c7ca;letter-spacing:.31em;font-weight:700}
+.eyebrow {color:#d3d3d7;letter-spacing:.18em;font-size:10px}
+.auth-intro h1 {font-weight:900;text-transform:uppercase;letter-spacing:-.065em;font-size:clamp(40px,5.6vw,77px);line-height:1.05;margin:26px 0 23px}
+.auth-intro h1 em {color:#fff;-webkit-text-stroke:1.2px #f4f4f5;paint-order:stroke;opacity:.63}
+.auth-intro p {color:#b1b1b6;max-width:525px;font-size:15px;line-height:1.8}
+.auth-tracks {padding-top:25px;margin-top:33px;border-top:1px solid #303135;gap:21px}
+.auth-tracks span {color:#c5c6ca;font-size:9px;letter-spacing:.06em}
+.auth-tracks i {background:#f4f4f5;color:#161619;border-radius:2px;padding:5px 7px;font-weight:900}
+.auth-line-art {color:#9b9ca1;opacity:.5;margin-top:23px}
+.auth-line-art svg {max-height:142px}
+.auth-card {background:#f7f7f8;border:1px solid #e7e7e9;border-radius:8px;box-shadow:18px 18px 0 rgba(255,255,255,.035),0 35px 110px rgba(0,0,0,.45);padding:42px clamp(24px,3.3vw,45px) 30px;position:relative}
+.auth-card:before {content:'';position:absolute;top:-1px;left:0;width:105px;height:5px;background:#2d2e34}
+.auth-card h2 {font-size:27px;letter-spacing:-.055em;color:#17171a;font-weight:900}
+.auth-card .muted {color:#696b72}
+.version-pill {background:#e7e7e9;border:1px solid #d4d4d7;color:#37383e;font-size:9px;letter-spacing:.09em}
+.three-dots {color:#72747a}
+.auth-card form label,.register-field label {color:#313239;font-weight:700}
+.login-input {border-radius:5px;border-color:#d3d3d7}
+.login-input>span {color:#5f6068}
+.login-input:focus-within {border-color:#6f6f76;box-shadow:0 0 0 3px #e4e4e7}
+.auth-submit {background:#17181c!important;color:white!important;border:1px solid #17181c!important;border-radius:5px}
+.auth-submit:hover {background:#37383e!important}
+.demo-box {background:#ededf0;border-color:#dadbdf;border-radius:4px}
+.demo-tag {color:#494a51}
+.demo-box strong {color:#565861}
+.demo-box code {color:#1d1e22;background:#fff}
+.demo-box small {color:#6b6d75}
+.auth-link-button {color:#303139}
+.auth-foot {color:#88898c}
+.registration-warning {background:#f1efe9;color:#686356;border-color:#dfdbd0}
+.register-field input:focus {border-color:#666870;outline:none;box-shadow:0 0 0 2px #dedee2}
+.register-acknowledge input,.verify-method input {accent-color:#22242a}
+.verify-icon {background:#e5e5e9;color:#22232a}
+/* Workspace and navigation */
+.topbar {background:#0b0b0d;border-bottom:1px solid #2d2d32;box-shadow:0 4px 18px #0005}
+.topbar-brand {font-weight:900;letter-spacing:-.015em;gap:12px}
+.topbar-brand img {padding:2px;object-fit:contain}
+.topbar-brand b {color:#fff;font-weight:600}
+.topbar-brand small {color:#a9a9ad;letter-spacing:.16em}
+.env-badge {color:#aeafb4}
+.logout {background:#2a2b30;color:#f5f5f5;border:1px solid #3e3e43}
+.logout:hover {background:#414248}
+.workspace {background:#0d0e10}
+.sidebar {background:#121316;color:#e6e6e9;border-right:1px solid #34353a}
+.sidebar-caption {color:#86888f}
+.side-heading {color:#fff;font-weight:800}
+.side-heading span {color:#8a8b92}
+.sidebar-rule {background:#34353a}
+.sidebar-group-label {color:#dedee0}
+.nav-item {border-radius:4px;color:#b6b7bd}
+.nav-item:hover {background:#222328}
+.nav-item.active {background:#303137;border-color:#5a5b63;color:white;box-shadow:inset 3px 0 #f1f1f2}
+.nav-icon {color:#d6d6d9}
+.nav-arrow {color:#dadadd}
+.drafts-heading {color:#b6b7bf}
+.drafts-heading button {border-color:#494a50;background:#25262a;color:#fff}
+.draft-btn {background:#202125;color:#f0f0f2;border-color:#393a40;border-radius:4px}
+.draft-btn:hover {border-color:#afafb4}
+.draft-btn span,.draft-empty {color:#b0b0b4}
+.sidebar-bottom {border-color:#35363c;color:#a8a9b1}
+.sidebar-bottom-icon {color:#d7d7db}
+.sidebar-bottom b {color:#efeff1}
+.main-area {background:radial-gradient(circle at 77% 8%,rgba(145,145,151,.075),transparent 28%),linear-gradient(135deg,#1c1d21,#0b0c0e 58%,#15161a)}
+.breadcrumb {color:#9a9ba3}
+.breadcrumb span {color:#787a82}
+.breadcrumb b {color:#f0f0f3}
+.last-saved {color:#b0b1b6}
+.section-kicker {color:#c8c8cc;letter-spacing:.2em}
+.page-title-row h1 {color:white;font-weight:900;text-transform:uppercase;letter-spacing:-.035em}
+.page-title-row p {color:#afb0b5}
+.page-title-row .button.outlined {background:#27282d;color:#f7f7f9;border-color:#5a5b62}
+.page-title-row .button.outlined:hover {background:#3b3c43}
+/* White rider sheet floating above the black application */
+.paper {background:#fdfdfd;border:1px solid #44454d;border-radius:2px;box-shadow:24px 30px 0 #0003,0 35px 95px #0008}
+.paper-hero {background:linear-gradient(135deg,#111215 0%,#232428 72%,#15161a);min-height:224px;position:relative}
+.paper-hero:before {content:'';pointer-events:none;position:absolute;inset:0;background-image:radial-gradient(circle,rgba(236,236,239,.36) 1px,transparent 1.8px);background-size:16px 16px;opacity:.24;mask-image:linear-gradient(95deg,transparent 53%,#000 100%);-webkit-mask-image:linear-gradient(95deg,transparent 53%,#000 100%)}
+.paper-hero:after {background:#eee;left:28px;top:40px;width:3px;height:56px}
+.paper-overline {color:#c5c5cb;letter-spacing:.18em;font-size:9px}
+.paper-overline span {color:#f5f5f7}
+.paper-hero h2 {font-weight:900;text-transform:uppercase;letter-spacing:-.065em;font-size:clamp(25px,3vw,37px)}
+.paper-hero h2 span {color:#f1f1f4}
+.paper-hero p {color:#d6d6dc;letter-spacing:.13em;font-size:10px}
+.paper-accent {background:#e9e9ec;width:100px;height:2px}
+.paper-hero small {color:#b3b4ba}
+.hero-art {color:#e8e8ed;filter:grayscale(1);opacity:.56}
+.paper-body {background:#fdfdfd}
+.form-section {border-color:#e4e4e7}
+.section-num {background:#202126;color:#fafafa;border-radius:2px}
+.form-section-title b {font-weight:800;color:#25262b}
+.form-section-title small {color:#81838a}
+.field label {color:#41434a;font-weight:700}
+.field input:not([type=file]),.field select,.field textarea,.instrument-row input,.instrument-row select {border-color:#d6d6dc;color:#2d2e33;border-radius:4px;background:#fff}
+.field input:focus,.field select:focus,.field textarea:focus,.instrument-row input:focus {border-color:#656770;box-shadow:0 0 0 2px #eeeef0;outline:none}
+.upload-box {background:#f5f5f6;border-color:#babac1}
+.add-btn {background:#f0f0f2;color:#31333a;border-color:#a4a4ad}
+.add-btn:hover {background:#e8e8eb}
+.instrument-remove {color:#7d5054;border-color:#ddd4d4}
+.paper-footer {background:#f2f2f3}
+.paper-footer-top {color:#6d7078;border-color:#dedee2}
+.dark-outline {border-color:#a3a4ab!important;background:#f7f7f7!important}
+.context-card {background:#222328;color:#f2f2f4;border:1px solid #45464f;border-radius:4px}
+.context-symbol {background:#34353b;color:#f2f2f4}
+.context-status {color:#d0d0d4}
+.context-status i {background:#e5e5e7}
+.context-card h3 {color:#fff}
+.context-hint {background:#1c1d21;border-color:#404148;color:#c3c3c8}
+.site-footer {border-color:#44454c;color:#b6b6bc}
+.site-footer b {color:#e9e9eb}
+.footer-brand {font-weight:900;letter-spacing:-.045em;color:#fff}
+.footer-brand b {color:#d9d9df}
+.copyright {border-color:#3c3d45;color:#8f919b}
+.field-note {display:block;color:#868992;font-size:10px;line-height:1.6;margin-top:7px}
+.field-optional {font-weight:500;color:#92939a}
+/* Keep the brand monochrome when printing the generated document. */
+@media print {
+  html,body,#print-root, #print-root * {font-family:'Montserrat',Arial,Helvetica,sans-serif!important}
+  .print-cover {background:#151518!important}
+  .print-cover .print-over {color:#d3d3d6}
+  .print-cover h1 {font-weight:900;text-transform:uppercase;letter-spacing:-.05em}
+  .print-cover h2 {color:#d2d2d6}
+  .print-cover .print-line {background:#f3f3f4}
+  .print-logo {border-color:#74747a;color:#fff}
+  .print-section h3 span {background:#242428}
+}
+@media(max-width:760px) {
+  .auth-page:before {width:74vw;opacity:.24}
+  .auth-intro {padding-right:0}
+  .identity-lockup {margin-bottom:20px}
+  .identity-lockup img {width:55px;height:55px}
+  .auth-intro h1 {font-size:clamp(33px,8vw,52px)}
+  .auth-intro p {font-size:13px}
+  .auth-card {border-radius:6px;box-shadow:0 15px 50px #0008}
+  .topbar {padding:0 18px}
+  .paper {box-shadow:0 25px 65px #0008}
+  .paper-hero {min-height:190px}
+}
+@media(max-width:460px) {
+  .auth-card {padding:30px 22px}
+  .paper-hero h2 {font-size:26px}
+  .paper-hero:after {left:17px;top:30px}
+}
