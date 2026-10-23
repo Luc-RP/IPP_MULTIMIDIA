@@ -1,4 +1,4 @@
-/* LK MULTIMIDIA | Site demonstrativo v0.4.0. Sem autenticacao real nem banco online. */
+/* LK MULTIMIDIA | Site demonstrativo v0.4.2. Sem autenticacao real nem banco online. */
 'use strict';
 (() => {
   const DEMO_EMAIL = 'demo@lk.local';
@@ -231,10 +231,25 @@
       $('verification-preview-note').textContent='Simulação de verificação por '+via+'. Nenhum código gerado ou enviado.';
     }));
   }
+  function setupDemoCredentials() {
+    // As credenciais públicas mostradas no login devem corresponder exatamente à validação.
+    // Exclusivamente para o protótipo. Nunca utilizar este mecanismo com contas reais.
+    const shownEmail=$('demo-visible-email'), shownPassword=$('demo-visible-password');
+    if(shownEmail)shownEmail.textContent=DEMO_EMAIL;
+    if(shownPassword)shownPassword.textContent=DEMO_PASSWORD;
+    const fillButton=$('demo-fill');
+    if(fillButton)fillButton.addEventListener('click',()=>{
+      $('login-email').value=DEMO_EMAIL;
+      $('login-password').value=DEMO_PASSWORD;
+      $('login-password').type='password';
+      $('login-error').textContent='';
+      $('login-email').focus();
+    });
+  }
   function login() {
     $('login-form').addEventListener('submit',event=>{
       event.preventDefault();const email=$('login-email').value.trim().toLowerCase(),pass=$('login-password').value;
-      if(!((email===DEMO_EMAIL && pass===DEMO_PASSWORD)||(email===LEGACY_DEMO_EMAIL && pass===LEGACY_DEMO_PASSWORD))){$('login-error').textContent='Credenciais de demonstração inválidas.';return;}
+      if(!((email===DEMO_EMAIL && pass===DEMO_PASSWORD)||(email===LEGACY_DEMO_EMAIL && pass===LEGACY_DEMO_PASSWORD))){$('login-error').textContent='Credenciais de demonstração inválidas. Use o botão "Preencher acesso de teste".';return;}
       $('login-error').textContent='';demoSession=true;try{sessionStorage.setItem(SESSION_KEY,'demo');}catch{}showApp();
     });
     $('toggle-password').addEventListener('click',()=>{$('login-password').type=$('login-password').type==='password'?'text':'password';});
@@ -257,7 +272,7 @@
     $('event-type').addEventListener('change',updateVigil);
     for(const id of ['event-year','year-start','year-end'])$(id).addEventListener('change',updateVigil);
     form.addEventListener('input',updateSummary);form.addEventListener('change',updateSummary);
-    setupImage();login();setupRegistrationPreview();$('copyright-year').textContent=String(new Date().getFullYear());
+    setupImage();setupDemoCredentials();login();setupRegistrationPreview();$('copyright-year').textContent=String(new Date().getFullYear());
     try{demoSession=sessionStorage.getItem(SESSION_KEY)==='demo';}catch{} if(demoSession)showApp();
   }
   setupListeners();

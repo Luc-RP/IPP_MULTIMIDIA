@@ -314,3 +314,7 @@ button, a, input, select, textarea {transition:background-color .16s ease,border
 @media (prefers-reduced-motion:reduce) {
   .auth-submit:hover {transform:none}
 }
+
+/* v0.4.2: acesso demonstrativo sempre consistente e fácil de testar */
+.demo-box .demo-fill{display:block;width:100%;margin-top:15px;border:1px solid #4b8d88;border-radius:6px;background:#f1faf8;color:#176b67;font-weight:800;font-size:11px;padding:11px 13px;box-shadow:none}
+.demo-box .demo-fill:hover{background:#e1f4ef;border-color:#237974;color:#134d4a}

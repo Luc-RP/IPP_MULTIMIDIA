@@ -80,3 +80,11 @@ Documentação central: Notion LK Multimídia e Google Drive/ObsD LK Multimídia
 - Backend, conta real, OTP, MySQL e pagamento ainda não foram implementados; credenciais de demonstração continuam públicas.
 
 - Acesso demonstrativo antigo de IPP é aceito temporariamente por compatibilidade, sem autenticação real. Mostrar somente LK na interface.
+
+## Correção de login de demonstração v0.4.2
+
+- Corrigido desencontro potencial entre HTML atualizado e JavaScript antigo armazenado em cache, versionando a URL do `app.js` e do CSS de marca para `v=0.4.2`.
+- As credenciais demonstrativas exibidas no login passam a ser preenchidas a partir das mesmas constantes usadas na validação JavaScript.
+- Adicionado o botão **Preencher acesso de teste** para preencher e-mail e senha sem digitação.
+- Login demonstrativo segue público, sem autenticação real; nenhuma configuração MySQL ou ADM foi modificada.
+- Quando modificar simultaneamente HTML, JS e estilos, preferir um único commit atômico para evitar deploys intermediários com versões inconsistentes.
