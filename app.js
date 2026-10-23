@@ -1,8 +1,10 @@
 /* LK MULTIMIDIA | Site demonstrativo v0.4.0. Sem autenticacao real nem banco online. */
 'use strict';
 (() => {
-  const DEMO_EMAIL = 'demo@ipp.local';
-  const DEMO_PASSWORD = 'IPPdemo2026!'; // Credencial publica de demonstracao. Nunca reutilizar em producao.
+  const DEMO_EMAIL = 'demo@lk.local';
+  const LEGACY_DEMO_EMAIL = 'demo@ipp.local';
+  const DEMO_PASSWORD = 'LKdemo2026!';
+  const LEGACY_DEMO_PASSWORD = 'IPPdemo2026!'; // Compatibilidade com o acesso anterior, exclusivamente demonstrativo. // Credencial publica de demonstracao. Nunca reutilizar em producao.
   const STORAGE_KEY = 'ipp.multimidia.v0.1.drafts';
   const SESSION_KEY = 'ipp.multimidia.demo.session';
   const selectors = id => document.getElementById(id);
@@ -232,7 +234,7 @@
   function login() {
     $('login-form').addEventListener('submit',event=>{
       event.preventDefault();const email=$('login-email').value.trim().toLowerCase(),pass=$('login-password').value;
-      if(email!==DEMO_EMAIL || pass!==DEMO_PASSWORD){$('login-error').textContent='Credenciais de demonstração inválidas.';return;}
+      if(!((email===DEMO_EMAIL && pass===DEMO_PASSWORD)||(email===LEGACY_DEMO_EMAIL && pass===LEGACY_DEMO_PASSWORD))){$('login-error').textContent='Credenciais de demonstração inválidas.';return;}
       $('login-error').textContent='';demoSession=true;try{sessionStorage.setItem(SESSION_KEY,'demo');}catch{}showApp();
     });
     $('toggle-password').addEventListener('click',()=>{$('login-password').type=$('login-password').type==='password'?'text':'password';});
