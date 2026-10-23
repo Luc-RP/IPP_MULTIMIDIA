@@ -1,4 +1,4 @@
-# LK Multimídia — protótipo v0.2.0
+# LK Multimídia — protótipo v0.4.0
 
 Primeira versão de demonstração de um site de formulários técnicos para a Igreja Príncipe Poderoso. Identidade visual inspirada no Rider Técnico Banda IPP aprovado em 23/10/2026.
 
@@ -67,3 +67,14 @@ Documentação central: Notion LK Multimídia e Google Drive/ObsD LK Multimídia
 - Compra ou solicitação de Premium será implementada sem Pix ou cobrança automática por enquanto; ativação administrativa posteriormente.
 - Painel ADM multiplataforma é desenvolvido separadamente da hospedagem pública, com arquitetura alvo Tauri 2 (Windows + Android). No protótipo, qualquer dado exibido no painel é fictício.
 - Banco MySQL local e API ainda não instalados nem conectados.
+
+## Identidade visual LK — v0.4.0 (23/10/2026)
+
+- Referência autorizada: pasta Google Drive LK MULTIMIDIA / identidade visual LK, especialmente LKSTUDIO.png, Back.png, Front.png e Logo1.png.
+- Visual: monocromia grafite/preto/branco, marca angular "K", retículas, diagonais e elementos de áudio, conforme material da LK Studio.
+- Títulos: Montserrat 800/900 (aproximação visual; família exata da arte não está identificada nos arquivos). Carrega pelo Google Fonts quando disponível; fallback Arial. Não distribuir nem embutir arquivos de fontes.
+- Estilos novos isolados em `brand-lk.css`; símbolo vetorial provisório em `assets/lk-brand-studio.svg` inspirado na marca, sem substituir originais.
+- Marca do site, login e capa impressa alterados para LK Multimídia, removendo vestígios institucionais da IPP de textos visíveis do rider.
+- Preservados comportamentos de formulário, rascunhos e exportação; chave antiga `ipp.multimidia.v0.1.drafts` permanece para não perder rascunhos de teste existentes.
+- O painel ADM Tauri na pasta privada do Drive NÃO foi reestilizado.
+- Backend, conta real, OTP, MySQL e pagamento ainda não foram implementados; credenciais de demonstração continuam públicas.
