@@ -23,7 +23,7 @@
 
   function notify(message, isError=false) {
     const t = $('toast'); t.textContent = message;
-    t.style.background = isError ? '#8e3d43' : '#1f6560';
+    t.style.background = isError ? '#8e3d43' : '#303137';
     t.classList.add('show'); clearTimeout(toastTimer);
     toastTimer = setTimeout(() => t.classList.remove('show'), 3600);
   }
