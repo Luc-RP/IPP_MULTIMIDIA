@@ -198,3 +198,119 @@ button, a, input, select, textarea {transition:background-color .16s ease,border
 .muted-hint {background:#191a1e;border-color:#3e3f46;color:#c4c5ca}
 .muted-hint p {color:#acadb5}
 .toast {border-color:#81828a;border-radius:5px}
+
+/*
+ LK Multimidia — acabamento de cor v0.4.1 — 2026-10-23
+ Base: LK Studio preto, grafite e branco (mantida).
+ Acentos: azul-petroleo #153A45 / #1C3844, turquesa #58C7BA e teal #237974.
+ Detalhes sutis em luz difusa, padrao pontilhado, linhas e botoes.
+ Nao altera layouts, formularios, logica de login, arquivo PDF salvo ou painel ADM.
+*/
+:root {
+  --lk-accent:#58c7ba;
+  --lk-accent-dark:#237974;
+  --lk-accent-ink:#155c5b;
+  --lk-petrol:#153a45;
+  --lk-tint:#eaf7f5;
+  --cyan:#56bdb4;
+  --cyan-dark:#1c7974;
+  --pale:#ecf7f5;
+}
+::selection {background:#81dcd2;color:#0b2228}
+:focus-visible {outline-color:#55c9bd!important}
+/* Login: iluminacao fria sobre a identidade grafite, nunca um fundo colorido dominante. */
+.auth-page {
+  background:
+    radial-gradient(ellipse at 13% 15%,rgba(24,94,104,.37),transparent 39%),
+    radial-gradient(ellipse at 85% 83%,rgba(27,91,104,.16),transparent 39%),
+    repeating-linear-gradient(137deg,transparent 0 19px,rgba(255,255,255,.016) 20px,transparent 21px),
+    linear-gradient(128deg,#0c151b 0%,#0a0b0f 54%,#13151b 100%);
+}
+.auth-glow {display:block;opacity:.11;filter:blur(100px)}
+.auth-glow-one {background:#39b4aa}
+.auth-glow-two {background:#36779a}
+.auth-page:before {background-image:radial-gradient(circle,rgba(111,198,195,.95) 2px,transparent 3px);opacity:.23}
+.auth-page:after {background:repeating-linear-gradient(90deg,#75bac3 0 3px,transparent 3px 11px);opacity:.16}
+.identity-lockup img {border-color:rgba(111,198,195,.28);box-shadow:0 0 22px rgba(67,183,177,.09)}
+.identity-lockup small {color:#afc7ca}
+.eyebrow {color:#8ddbd0}
+.auth-intro h1 em {color:#9de2da;-webkit-text-stroke:1px #6fcac0;opacity:1}
+.auth-intro p {color:#b1c1c5}
+.auth-tracks {border-top-color:#30484b}
+.auth-tracks i {background:#d8f1ee;color:#155d60}
+.auth-line-art {color:#78bbb7;opacity:.56}
+.auth-card {box-shadow:18px 18px 0 rgba(86,178,180,.055),0 35px 110px rgba(0,0,0,.44)}
+.auth-card:before {background:linear-gradient(90deg,#256e73,#63c8bb 65%,#d9e2e6)}
+.version-pill {background:#e5f3f1;border-color:#cce7e3;color:#21635f}
+.login-input:focus-within,.register-field input:focus {border-color:#3eaaa2;box-shadow:0 0 0 3px rgba(64,176,169,.14)}
+.auth-submit {background:linear-gradient(110deg,#155d67,#247a77)!important;border-color:#247a77!important;color:#fff!important;box-shadow:0 10px 27px rgba(30,98,102,.17)}
+.auth-submit:hover {background:linear-gradient(110deg,#1c6d75,#2e8e88)!important;transform:translateY(-1px)}
+.auth-link-button {color:#216f6d}
+.register-acknowledge input,.verify-method input {accent-color:#267f79}
+.verify-icon {background:#e3f3ef;color:#247970}
+/* Editor: enquadramento petróleo discreto com papel e tipografia da LK intactos. */
+.topbar {background:linear-gradient(90deg,#0e1015,#101b22);border-bottom-color:#31444a}
+.topbar-brand small {color:#92aeb5}
+.env-badge {color:#b1c2c6}
+.workspace {background:#10151a}
+.sidebar {background:linear-gradient(180deg,#13191e,#121316 55%,#15161a);border-right-color:#304247}
+.sidebar-rule {background:#304247}
+.nav-item:hover {background:rgba(72,145,146,.12)}
+.nav-item.active {background:linear-gradient(90deg,#214147,#292f35);border-color:#386266;box-shadow:inset 3px 0 #65cabf}
+.nav-item.active .nav-icon,.nav-item.active .nav-arrow {color:#a8ebe3}
+.sidebar-bottom-icon {color:#83d3cb}
+.main-area {
+  background:
+    radial-gradient(ellipse at 77% 6%,rgba(35,115,131,.16),transparent 32%),
+    radial-gradient(ellipse at 2% 75%,rgba(29,92,105,.11),transparent 45%),
+    linear-gradient(130deg,#17232a,#0d1016 58%,#16191e);
+}
+.breadcrumb b,.section-kicker {color:#89d9cf}
+.page-title-row .button.outlined {border-color:#456c70}
+.page-title-row .button.outlined:hover {background:#2c474c}
+.paper {border-color:#4a6063;box-shadow:24px 30px 0 rgba(9,20,26,.26),0 36px 90px rgba(0,0,0,.66),0 0 35px rgba(35,127,131,.055)}
+.paper-hero {
+  background:
+    radial-gradient(ellipse at 91% 24%,rgba(63,156,165,.17),transparent 43%),
+    linear-gradient(128deg,#101419 0%,#1a292f 63%,#171a20 100%);
+}
+.paper-hero:before {background-image:radial-gradient(circle,rgba(148,223,218,.5) 1px,transparent 1.8px);opacity:.26}
+.paper-hero:after {background:linear-gradient(#84e3d8,#278d8a)}
+.paper-overline span {color:#78d9cf}
+.paper-hero h2 span {color:#bfece5}
+.paper-hero p {color:#c7dbdf}
+.paper-accent {background:linear-gradient(90deg,#5bd2c4,#c0e5e7);width:120px}
+.hero-art {filter:none;color:#a9dcd8;opacity:.66}
+.section-num {background:#244b53;color:#f5fffe}
+.form-section-title small {color:#738c91}
+.field input:focus,.field select:focus,.field textarea:focus,.instrument-row input:focus,.instrument-row select:focus {border-color:#2c9189;box-shadow:0 0 0 3px rgba(64,177,166,.12)}
+.upload-box {background:#f4faf9;border-color:#a9cfc9}
+.upload-label>span {color:#27877e}
+.add-btn {background:#e7f6f3;color:#206b68;border-color:#80c9c0}
+.add-btn:hover {background:#d9eee9}
+.vigil-years {background:#eef8f6;border-color:#c6e3df}
+.text-button {color:#227f76}
+.paper-footer {background:#f3f7f7}
+.context-card {background:linear-gradient(145deg,#252a30,#1d3439);border-color:#416267}
+.context-symbol {background:#29474b;color:#a4e8df}
+.context-status {color:#97dcd1}
+.context-status i {background:#55c7ba}
+.context-stats {border-color:#48646a}
+.context-stats span {color:#b1cbce}
+.context-hint {background:#21363a;border-color:#426467;color:#c6ebe8}
+.context-hint p {color:#b0d0ce}
+.muted-hint {background:#1e282f;border-color:#3c5059}
+.site-footer {border-top-color:#40575e}
+.footer-brand b {color:#a4e2d9}
+.copyright {border-top-color:#3a5056}
+.toast {background:#204a4e;border-color:#4bbdb1}
+/* Acento minimo no PDF. Fundo permanece neutro e economico na impressao. */
+@media print {
+  .print-cover {background:#152a30!important}
+  .print-cover .print-line {background:#53baad}
+  .print-logo {border-color:#67b7b0}
+  .print-section h3 span {background:#22535a}
+}
+@media (prefers-reduced-motion:reduce) {
+  .auth-submit:hover {transform:none}
+}
