@@ -1,4 +1,4 @@
-# IPP Multimídia — protótipo v0.2.0
+# LK Multimídia — protótipo v0.2.0
 
 Primeira versão de demonstração de um site de formulários técnicos para a Igreja Príncipe Poderoso. Identidade visual inspirada no Rider Técnico Banda IPP aprovado em 23/10/2026.
 
@@ -56,4 +56,14 @@ README.md           Instruções e limitações
 
 ## Desenvolvimento e continuidade
 
-Documentação central: Notion IPP Multimídia e Google Drive/ObsD IPP Multimídia. Este protótipo é uma base para revisão, não um produto pronto para operação.
+Documentação central: Notion LK Multimídia e Google Drive/ObsD LK Multimídia. Este protótipo é uma base para revisão, não um produto pronto para operação.
+
+## Plano Free e direção do produto (v0.3.0)
+
+- Produto passa a se chamar **LK Multimídia**; marca final e identidade visual aguardam imagens oficiais.
+- Telefone no formulário demonstrativo fica **opcional**. E-mail continua obrigatório.
+- Após confirmação **real** de e-mail, a conta terá acesso ao plano Free sem aprovação manual adicional. Isso ainda não funciona no protótipo.
+- Catálogo de caixas de som é selecionável no Free; opção de modelo personalizado está bloqueada no cliente como prévia. A autorização real será verificada no backend, nunca somente no HTML/JS.
+- Compra ou solicitação de Premium será implementada sem Pix ou cobrança automática por enquanto; ativação administrativa posteriormente.
+- Painel ADM multiplataforma é desenvolvido separadamente da hospedagem pública, com arquitetura alvo Tauri 2 (Windows + Android). No protótipo, qualquer dado exibido no painel é fictício.
+- Banco MySQL local e API ainda não instalados nem conectados.
