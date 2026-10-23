@@ -11,8 +11,8 @@ Primeira versão de demonstração de um site de formulários técnicos para a I
 
 ## Cadastro visual (v0.2.0)\n\n- Tela de cadastro com nome, e-mail, telefone, senha e confirmação de senha; validações apenas no navegador.\n- Prévia de escolha do código de confirmação por e-mail ou SMS (campo de código desabilitado).\n- **Nenhuma conta é criada.** Nenhuma senha, telefone ou e-mail é persistido ou enviado. Campos apagados ao avançar. Não utilizar dados reais nesta prévia pública.\n- Para abrir cadastros reais é necessário conectar autenticação gerenciada, provedor SMTP, e para SMS um provedor que normalmente cobra pelo envio, com proteção contra abuso e regras de banco.\n\n## Acesso demo (público e intencional)
 
-- E-mail: `demo@ipp.local`
-- Senha: `IPPdemo2026!`
+- E-mail: `demo@lk.local`
+- Senha: `LKdemo2026!`
 
 **ATENÇÃO:** Não é autenticação real. A senha está no código-fonte e na própria tela. A tela de login apenas demonstra o fluxo visual e **não protege arquivos, dados ou páginas**. NÃO use essas credenciais em produção e NÃO insira dados pessoais ou confidenciais. Não foi ativado Supabase, servidor, banco online, redefinição de senha ou política de acesso.
 
@@ -78,3 +78,5 @@ Documentação central: Notion LK Multimídia e Google Drive/ObsD LK Multimídia
 - Preservados comportamentos de formulário, rascunhos e exportação; chave antiga `ipp.multimidia.v0.1.drafts` permanece para não perder rascunhos de teste existentes.
 - O painel ADM Tauri na pasta privada do Drive NÃO foi reestilizado.
 - Backend, conta real, OTP, MySQL e pagamento ainda não foram implementados; credenciais de demonstração continuam públicas.
+
+- Acesso demonstrativo antigo de IPP é aceito temporariamente por compatibilidade, sem autenticação real. Mostrar somente LK na interface.
