@@ -1,0 +1,13 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    {
+      "source": "/health",
+      "destination": "https://lk-multimidia-api.vercel.app/api/health"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "https://lk-multimidia-api.vercel.app/api/:path*"
+    }
+  ]
+}
