@@ -29,13 +29,13 @@
         <p id="login-description" class="muted">Entre com sua conta para organizar e salvar seus riders técnicos.</p>
         <p id="account-status" class="account-status" role="status" aria-live="polite"></p><form id="login-form" autocomplete="on">
           <label for="login-email">E-mail de acesso</label>
-          <div class="login-input"><span>@</span><input id="login-email" type="email" autocomplete="username" required disabled placeholder="seu@email.com" /></div>
+          <div class="login-input"><span>@</span><input id="login-email" type="email" autocomplete="username" required placeholder="seu@email.com" /></div>
           <label for="login-password">Senha</label>
-          <div class="login-input"><span>⌁</span><input id="login-password" type="password" autocomplete="current-password" required disabled placeholder="Digite sua senha" /><button type="button" id="toggle-password" class="ghost-icon" aria-label="Mostrar senha">◉</button></div>
+          <div class="login-input"><span>⌁</span><input id="login-password" type="password" autocomplete="current-password" required placeholder="Digite sua senha" /><button type="button" id="toggle-password" class="ghost-icon" aria-label="Mostrar senha">◉</button></div>
           <p id="login-error" class="error-text" aria-live="polite"></p>
           <button type="submit" class="button primary auth-submit" disabled>Entrar na plataforma <span>→</span></button>
         </form>
-        <button type="button" id="show-register" class="auth-link-button" disabled>Não tem uma conta? <strong>Cadastre-se →</strong></button>
+        <button type="button" id="show-register" class="auth-link-button">Não tem uma conta? <strong>Cadastre-se →</strong></button>
         <section id="register-view" class="register-view" aria-labelledby="register-title" hidden>
           <div id="register-form-step">
             <h2 id="register-title">Criar uma conta</h2>
@@ -47,7 +47,7 @@
               <div class="register-field"><label for="register-password">Senha</label><input id="register-password" name="password" type="password" required minlength="12" maxlength="128" autocomplete="new-password" placeholder="Pelo menos 12 caracteres"></div>
               <div class="register-field"><label for="register-password-confirm">Repita a senha</label><input id="register-password-confirm" name="passwordConfirm" type="password" required minlength="12" maxlength="128" autocomplete="new-password" placeholder="Repita a senha"></div>
               <p class="error-text" id="register-error" aria-live="polite"></p>
-              <button class="button primary auth-submit" type="submit">Criar conta <span>→</span></button>
+              <button class="button primary auth-submit" type="submit" disabled>Criar conta <span>→</span></button>
             </form>
           </div>
           <div id="register-verification-step" hidden>
