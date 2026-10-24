@@ -1,12 +1,7 @@
-/* LK MULTIMIDIA | Site demonstrativo v0.4.2. Sem autenticacao real nem banco online. */
+/* LK MULTIMIDIA | Contas reais somente com API local segura. */
 'use strict';
 (() => {
-  const DEMO_EMAIL = 'demo@lk.local';
-  const LEGACY_DEMO_EMAIL = 'demo@ipp.local';
-  const DEMO_PASSWORD = 'LKdemo2026!';
-  const LEGACY_DEMO_PASSWORD = 'IPPdemo2026!'; // Compatibilidade com o acesso anterior, exclusivamente demonstrativo. // Credencial publica de demonstracao. Nunca reutilizar em producao.
   const STORAGE_KEY = 'ipp.multimidia.v0.1.drafts';
-  const SESSION_KEY = 'ipp.multimidia.demo.session';
   const selectors = id => document.getElementById(id);
   const form = selectors('rider-form');
   const definitions = {
@@ -17,7 +12,9 @@
   const starterInstruments = [
     {name:'Violão',qty:1},{name:'Baixo',qty:1},{name:'Teclado',qty:1},{name:'Bateria',qty:1},{name:'Guitarra',qty:1}
   ];
-  let activeModule = 'som', activeDraftId = null, artworkData = '', toastTimer = null, demoSession = false;
+  let activeModule = 'som', activeDraftId = null, artworkData = '', toastTimer = null;
+  const API_LOCAL=window.location.origin==='http://127.0.0.1:8787';
+  let cloudRiders=[],pendingEmail='';
   const workspaces = {};
   const $ = selectors;
 
@@ -29,13 +26,18 @@
   }
   function toSafeString(v) { return v == null ? '' : String(v); }
   function escapeHTML(value) { return toSafeString(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-  function readDrafts() {
-    try { const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); return Array.isArray(parsed) ? parsed : []; }
-    catch { return []; }
+  async function api(url,method='GET',body){
+    if(!API_LOCAL)throw new Error('Acesso às contas disponível somente pela instalação local da LK.');
+    let r;try{r=await fetch(url,{method,credentials:'same-origin',headers:body?{'Content-Type':'application/json'}:{},body:body?JSON.stringify(body):undefined,cache:'no-store'});}
+    catch{throw new Error('Servidor LK indisponível neste computador.');}
+    let data={};try{data=await r.json();}catch{}
+    if(!r.ok)throw new Error(data.error||'Operação não concluída.');
+    return data;
   }
-  function writeDrafts(rows) {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(rows)); return true; }
-    catch { notify('Armazenamento local cheio. Remova a imagem anexada ou um rascunho antigo.', true); return false; }
+  function readDrafts(){return cloudRiders;}
+  async function refreshRiders(){
+    const result=await api('/api/riders');cloudRiders=(result.riders||[]).map(row=>({id:String(row.id),eventName:row.title,module:row.category,updatedAt:row.updated_at}));
+    renderDraftList();
   }
   function initializeVocals() {
     for (const id of ['lead-singers','back-singers']) {
@@ -126,33 +128,35 @@
     }
     return true;
   }
-  function saveRider() {
+  async function saveRider(){
     if(!validate())return;
-    const drafts=readDrafts(),now=new Date().toISOString();
-    if(!activeDraftId)activeDraftId=(typeof crypto!=='undefined' && crypto.randomUUID)?crypto.randomUUID():`draft-${Date.now()}`;
-    const data={...capture(),id:activeDraftId,updatedAt:now};
-    const i=drafts.findIndex(x=>x.id===activeDraftId);
-    if(i>=0)drafts[i]=data;else drafts.unshift(data);
-    if(writeDrafts(drafts)){
-      $('last-saved').textContent='Salvo neste navegador • '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-      renderDraftList();notify('Rider salvo neste navegador (modo demo).');
-    }
+    if(artworkData){notify('Anexos ainda não estão disponíveis para salvamento. Remova a imagem.',true);return;}
+    const d=capture(),payload={category:activeModule,title:d.eventName||'Rider técnico',eventYear:d.eventType==='Vigília'?d.yearStart:d.eventYear,content:{...d,artwork:''}};
+    const btn=$('save-btn');btn.disabled=true;
+    try{
+      const resp=await api(activeDraftId?'/api/riders/'+encodeURIComponent(activeDraftId):'/api/riders',activeDraftId?'PUT':'POST',payload);
+      if(!activeDraftId)activeDraftId=String(resp.id);
+      await refreshRiders();$('last-saved').textContent='Salvo na sua conta';notify('Rider salvo.');
+    }catch(e){notify(e.message,true)}finally{btn.disabled=false;}
   }
-  function renderDraftList() {
-    const root=$('draft-list');root.replaceChildren();const items=readDrafts().sort((a,b)=>(b.updatedAt||'').localeCompare(a.updatedAt||''));
-    if(!items.length){const p=document.createElement('p');p.className='draft-empty';p.textContent='Nenhum rider salvo neste navegador.';root.append(p);return;}
-    items.slice(0,25).forEach(draft=>{
+  function renderDraftList(){
+    const root=$('draft-list');root.replaceChildren();
+    if(!cloudRiders.length){const p=document.createElement('p');p.className='draft-empty';p.textContent='Nenhum rider salvo.';root.append(p);return;}
+    cloudRiders.slice(0,25).forEach(d=>{
       const button=document.createElement('button');button.type='button';button.className='draft-btn';
-      const title=document.createElement('b');title.textContent=draft.eventName||'Rider sem título';
-      const date=document.createElement('span');const day=draft.updatedAt?new Date(draft.updatedAt).toLocaleDateString('pt-BR'):'sem data';date.textContent=`${definitions[draft.module]?.crumb||'RIDER'} · ${day}`;
-      button.append(title,date);button.addEventListener('click',()=>loadDraft(draft.id));root.append(button);
+      const title=document.createElement('b');title.textContent=d.eventName||'Rider sem título';
+      const meta=document.createElement('span');meta.textContent=(definitions[d.module]?.crumb||'RIDER')+' · '+(d.updatedAt?new Date(d.updatedAt).toLocaleDateString('pt-BR'):'');
+      button.append(title,meta);button.addEventListener('click',()=>loadDraft(d.id));root.append(button);
     });
   }
-  function loadDraft(id) {
-    const row=readDrafts().find(x=>x.id===id);if(!row)return notify('Rascunho não encontrado.',true);
-    const target=definitions[row.module]?row.module:'som';setModule(target,{restoreWorking:false});restore(row);activeDraftId=id;
-    $('last-saved').textContent='Rascunho carregado · '+new Date(row.updatedAt).toLocaleDateString('pt-BR');
-    notify('Rascunho carregado para edição.');
+  async function loadDraft(id){
+    try{
+      const result=await api('/api/riders/'+encodeURIComponent(id));
+      let content=result.rider.content_json;if(typeof content==='string')content=JSON.parse(content);
+      if(!content||typeof content!=='object')throw new Error('Conteúdo inválido.');
+      setModule(result.rider.category,{restoreWorking:false});restore({...content,artwork:''});activeDraftId=String(id);
+      $('last-saved').textContent='Rider carregado';notify('Rider carregado.');
+    }catch(e){notify(e.message,true);}
   }
   const printedPair=(label,value)=>`<div class="print-field"><small>${escapeHTML(label)}</small><strong>${escapeHTML(value||'Não informado')}</strong></div>`;
   const section=(number,title,contents)=>`<section class="print-section"><h3><span>${escapeHTML(number)}</span> ${escapeHTML(title)}</h3>${contents}</section>`;
@@ -190,72 +194,70 @@
     });
     $('remove-artwork').addEventListener('click',()=>{artworkData='';$('artwork').value='';updateArtwork();});
   }
-  function setupRegistrationPreview() {
-    const screenParts=['login-title','login-description','login-form','show-register','demo-box'];
-    const goTo = screen => {
-      const onLogin=screen==='login';
-      screenParts.forEach(id=>{$(id).hidden=!onLogin;});
-      $('register-view').hidden=onLogin;
-      $('register-form-step').hidden=false;
-      $('register-verification-step').hidden=true;
+  function setupAccountForms(){
+    const parts=['login-title','login-description','login-form','show-register'];
+    function showRegister(enabled){
+      for(const id of parts)$(id).hidden=enabled;
+      $('register-view').hidden=!enabled;
+      $('register-form-step').hidden=false;$('register-verification-step').hidden=true;
+      $('register-error').textContent='';$('verify-error').textContent='';
+    }
+    $('show-register').addEventListener('click',()=>showRegister(true));
+    $('register-back-login').addEventListener('click',()=>showRegister(false));
+    $('verification-back').addEventListener('click',()=>{$('register-form-step').hidden=false;$('register-verification-step').hidden=true;});
+    $('register-form').addEventListener('submit',async e=>{
+      e.preventDefault();if(!API_LOCAL)return;
+      const f=$('register-form');if(!f.reportValidity())return;
+      const password=$('register-password').value,passwordConfirm=$('register-password-confirm').value;
       $('register-error').textContent='';
-      if(onLogin)$('register-form').reset();
-    };
-    $('show-register').addEventListener('click',()=>goTo('register'));
-    $('register-back-login').addEventListener('click',()=>goTo('login'));
-    $('verification-back').addEventListener('click',()=>{
-      $('register-form').reset();
-      $('register-form-step').hidden=false;
-      $('register-verification-step').hidden=true;
+      if(password!==passwordConfirm){$('register-error').textContent='As senhas não coincidem.';return;}
+      const email=$('register-email').value.trim().toLowerCase();
+      const btn=f.querySelector('[type=submit]');btn.disabled=true;
+      try{
+        await api('/api/auth/register','POST',{fullName:$('register-name').value.trim(),email,phone:$('register-phone').value,password,passwordConfirm});
+        pendingEmail=email;f.reset();$('register-form-step').hidden=true;$('register-verification-step').hidden=false;
+        $('register-verification-code').value='';$('verify-error').textContent='Confira sua caixa de entrada e o spam.';
+      }catch(err){$('register-error').textContent=err.message;}finally{btn.disabled=false;}
     });
-    $('register-form').addEventListener('submit',event=>{
-      event.preventDefault();
-      const f=$('register-form'), p=$('register-password').value;
-      const confirm=$('register-password-confirm').value;
-      const digits=$('register-phone').value.replace(/\D/g,'');
-      const err=$('register-error');
-      err.textContent='';
-      if(!f.reportValidity())return;
-      if(digits && !/^\d{10,11}$/.test(digits) && !/^55\d{10,11}$/.test(digits)){err.textContent='Informe um telefone brasileiro com DDD (10 ou 11 dígitos).';return;}
-      if(p.length<12||!/[a-zA-Z]/.test(p)||!/\d/.test(p)){err.textContent='Use uma senha fictícia com no mínimo 12 caracteres, letras e números.';return;}
-      if(p!==confirm){err.textContent='As senhas de demonstração não coincidem.';return;}
-      // Segurança da prévia: apaga imediatamente todos os dados; nenhuma conta, SMS ou e-mail é criado/enviado.
-      f.reset();
-      $('register-form-step').hidden=true;
-      $('register-verification-step').hidden=false;
-      $('register-verification-code').value='';
-      $('verification-preview-note').textContent='Simulação de verificação por e-mail. Nenhum código gerado.';
+    $('verify-submit').addEventListener('click',async()=>{
+      const code=$('register-verification-code').value.trim();
+      if(!/^\d{6}$/.test(code)){$('verify-error').textContent='Informe os seis dígitos do e-mail.';return;}
+      const btn=$('verify-submit');btn.disabled=true;
+      try{await api('/api/auth/verify','POST',{email:pendingEmail,code});showRegister(false);
+        $('login-email').value=pendingEmail;$('account-status').textContent='E-mail confirmado. Entre com sua senha.';$('login-password').focus();
+      }catch(err){$('verify-error').textContent=err.message;}finally{btn.disabled=false;}
     });
-    document.querySelectorAll('input[name="verify-method"]').forEach(input=>input.addEventListener('change',()=>{
-      const via=input.value==='sms'?'SMS':'e-mail';
-      $('verification-preview-note').textContent='Simulação de verificação por '+via+'. Nenhum código gerado ou enviado.';
-    }));
-  }
-  function setupDemoCredentials() {
-    // As credenciais públicas mostradas no login devem corresponder exatamente à validação.
-    // Exclusivamente para o protótipo. Nunca utilizar este mecanismo com contas reais.
-    const shownEmail=$('demo-visible-email'), shownPassword=$('demo-visible-password');
-    if(shownEmail)shownEmail.textContent=DEMO_EMAIL;
-    if(shownPassword)shownPassword.textContent=DEMO_PASSWORD;
-    const fillButton=$('demo-fill');
-    if(fillButton)fillButton.addEventListener('click',()=>{
-      $('login-email').value=DEMO_EMAIL;
-      $('login-password').value=DEMO_PASSWORD;
-      $('login-password').type='password';
-      $('login-error').textContent='';
-      $('login-email').focus();
+    $('resend-code').addEventListener('click',async()=>{
+      try{await api('/api/auth/resend','POST',{email:pendingEmail});$('verify-error').textContent='Se o cadastro estiver pendente, um novo código será enviado quando permitido.';}
+      catch(err){$('verify-error').textContent=err.message;}
     });
-  }
-  function login() {
-    $('login-form').addEventListener('submit',event=>{
-      event.preventDefault();const email=$('login-email').value.trim().toLowerCase(),pass=$('login-password').value;
-      if(!((email===DEMO_EMAIL && pass===DEMO_PASSWORD)||(email===LEGACY_DEMO_EMAIL && pass===LEGACY_DEMO_PASSWORD))){$('login-error').textContent='Credenciais de demonstração inválidas. Use o botão "Preencher acesso de teste".';return;}
-      $('login-error').textContent='';demoSession=true;try{sessionStorage.setItem(SESSION_KEY,'demo');}catch{}showApp();
+    $('login-form').addEventListener('submit',async e=>{
+      e.preventDefault();if(!API_LOCAL)return;
+      const btn=$('login-form').querySelector('[type=submit]');btn.disabled=true;$('login-error').textContent='';
+      try{
+        await api('/api/auth/login','POST',{email:$('login-email').value,password:$('login-password').value});
+        await api('/api/me');$('login-password').value='';showApp();
+      }catch(err){$('login-error').textContent=err.message;}finally{btn.disabled=false;}
     });
     $('toggle-password').addEventListener('click',()=>{$('login-password').type=$('login-password').type==='password'?'text':'password';});
-    $('logout-btn').addEventListener('click',()=>{demoSession=false;try{sessionStorage.removeItem(SESSION_KEY);}catch{}$('app-page').hidden=true;$('auth-page').hidden=false;$('login-password').value='';});
+    $('logout-btn').addEventListener('click',async()=>{
+      try{await api('/api/auth/logout','POST',{});}catch{}
+      cloudRiders=[];$('app-page').hidden=true;$('auth-page').hidden=false;showRegister(false);$('login-password').value='';
+    });
+    if(!API_LOCAL){
+      $('account-status').textContent='Acesso às contas disponível na instalação local da LK.';
+      $('login-email').disabled=true;$('login-password').disabled=true;
+      $('login-form').querySelector('[type=submit]').disabled=true;$('show-register').disabled=true;
+    }else{
+      $('account-status').textContent='Entre ou crie sua conta com seu e-mail.';
+      api('/health').then(h=>{
+        $('show-register').disabled=!h.smtpReady;
+        if(!h.smtpReady)$('account-status').textContent='A confirmação por e-mail ainda não está configurada. O cadastro será liberado quando estiver disponível.';
+      }).catch(err=>{$('account-status').textContent=err.message;$('show-register').disabled=true;});
+      api('/api/me').then(()=>showApp()).catch(()=>{});
+    }
   }
-  function showApp() {$('auth-page').hidden=true;$('app-page').hidden=false;renderDraftList();updateSummary();}
+  function showApp() {$('auth-page').hidden=true;$('app-page').hidden=false;refreshRiders().catch(e=>notify(e.message,true));updateSummary();}
   function setupListeners() {
     initializeVocals();loadInstruments(starterInstruments);restore(defaultData('som'));
     const list=document.createElement('datalist');list.id='instrument-suggestions';['Violão','Guitarra','Contrabaixo','Baixo','Teclado','Bateria','Percussão','Piano','Saxofone','Trompete','Violino','Cajón','Ukulele','Sintetizador'].forEach(v=>{const opt=document.createElement('option');opt.value=v;list.append(opt)});document.body.append(list);
@@ -265,15 +267,14 @@
     $('save-btn').addEventListener('click',saveRider);
     $('cancel-btn').addEventListener('click',()=>{
       if(!confirm('Cancelar edição e descartar alterações não salvas?'))return;
-      if(activeDraftId){const saved=readDrafts().find(x=>x.id===activeDraftId);if(saved)restore(saved);else restore(defaultData());}
+      if(activeDraftId){loadDraft(activeDraftId);}
       else restore(defaultData());notify('Edição cancelada.');
     });
     $('pdf-btn').addEventListener('click',printRider);
     $('event-type').addEventListener('change',updateVigil);
     for(const id of ['event-year','year-start','year-end'])$(id).addEventListener('change',updateVigil);
     form.addEventListener('input',updateSummary);form.addEventListener('change',updateSummary);
-    setupImage();setupDemoCredentials();login();setupRegistrationPreview();$('copyright-year').textContent=String(new Date().getFullYear());
-    try{demoSession=sessionStorage.getItem(SESSION_KEY)==='demo';}catch{} if(demoSession)showApp();
+    setupImage();setupAccountForms();$('copyright-year').textContent=String(new Date().getFullYear());
   }
   setupListeners();
 })();
