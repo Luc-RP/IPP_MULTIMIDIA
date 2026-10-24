@@ -1,4 +1,4 @@
-/* LK MULTIMIDIA | Cadastro cloud: habilitar so com API+SMTP reais e validados. */
+/* LK MULTIMIDIA | Interface de acesso e riders. */
 'use strict';
 (() => {
   const STORAGE_KEY = 'ipp.multimidia.v0.1.drafts';
@@ -27,7 +27,7 @@
   function toSafeString(v) { return v == null ? '' : String(v); }
   function escapeHTML(value) { return toSafeString(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
   async function api(url,method='GET',body){
-    if(!API_READY)throw new Error('Contas LK ainda indisponíveis: conexão segura com a API não está pronta.');
+    if(!API_READY)throw new Error('Não foi possível concluir a operação.');
     let r;try{r=await fetch(url,{method,credentials:'same-origin',headers:body?{'Content-Type':'application/json'}:{},body:body?JSON.stringify(body):undefined,cache:'no-store'});}
     catch{throw new Error('Não foi possível conectar à API da LK.');}
     let data={};try{data=await r.json();}catch{}
@@ -130,7 +130,7 @@
   }
   async function saveRider(){
     if(!validate())return;
-    if(artworkData){notify('Anexos ainda não estão disponíveis para salvamento. Remova a imagem.',true);return;}
+    if(artworkData){notify('Remova a imagem anexada para salvar o rider.',true);return;}
     const d=capture(),payload={category:activeModule,title:d.eventName||'Rider técnico',eventYear:d.eventType==='Vigília'?d.yearStart:d.eventYear,content:{...d,artwork:''}};
     const btn=$('save-btn');btn.disabled=true;
     try{
@@ -201,6 +201,7 @@
       $('register-view').hidden=!enabled;
       $('register-form-step').hidden=false;$('register-verification-step').hidden=true;
       $('register-error').textContent='';$('verify-error').textContent='';
+      if(enabled)$('account-status').hidden=true;
     }
     $('show-register').addEventListener('click',()=>showRegister(true));
     $('register-back-login').addEventListener('click',()=>showRegister(false));
@@ -224,7 +225,7 @@
       if(!/^\d{6}$/.test(code)){$('verify-error').textContent='Informe os seis dígitos do e-mail.';return;}
       const btn=$('verify-submit');btn.disabled=true;
       try{await api('/api/auth/verify','POST',{email:pendingEmail,code});showRegister(false);
-        $('login-email').value=pendingEmail;$('account-status').textContent='E-mail confirmado. Entre com sua senha.';$('login-password').focus();
+        $('login-email').value=pendingEmail;$('account-status').hidden=false;$('account-status').textContent='E-mail confirmado. Entre com sua senha.';$('login-password').focus();
       }catch(err){$('verify-error').textContent=err.message;}finally{btn.disabled=false;}
     });
     $('resend-code').addEventListener('click',async()=>{
@@ -244,14 +245,13 @@
       try{await api('/api/auth/logout','POST',{});}catch{}
       cloudRiders=[];$('app-page').hidden=true;$('auth-page').hidden=false;showRegister(false);$('login-password').value='';
     });
-    // Formulários podem ser explorados enquanto a API continua fechada.
+    // A disponibilidade das operações é controlada pela resposta do servidor.
     // Nunca permitir POST real até que o backend confirme authEnabled.
     $('login-email').disabled=false;
     $('login-password').disabled=false;
     $('show-register').disabled=false;
     $('login-form').querySelector('[type=submit]').disabled=true;
     $('register-form').querySelector('[type=submit]').disabled=true;
-    $('account-status').textContent='Conectando à plataforma LK na nuvem...';
     fetch('/health',{method:'GET',cache:'no-store',credentials:'same-origin'})
       .then(async response=>{
         if(!response.ok)throw Error('API indisponível');
@@ -260,21 +260,14 @@
       .then(health=>{
         if(health.authEnabled!==true){
           API_READY=false;
-          $('account-status').textContent='LK na nuvem: cadastro e login ainda em homologação. Os campos e o formulário podem ser explorados, mas o envio está temporariamente indisponível.';
           return;
         }
         API_READY=true;
         $('login-form').querySelector('[type=submit]').disabled=false;
         $('register-form').querySelector('[type=submit]').disabled=health.smtpReady!==true;
-        $('account-status').textContent=health.smtpReady===true
-          ? 'Entre ou crie sua conta usando qualquer e-mail válido.'
-          : 'Login disponível; cadastro aguardando confirmação do serviço de e-mail.';
         api('/api/me').then(()=>showApp()).catch(()=>{});
       })
-      .catch(()=>{
-        API_READY=false;
-        $('account-status').textContent='Não foi possível consultar a API na nuvem. Você pode explorar os formulários, mas o envio está indisponível.';
-      });
+      .catch(()=>{API_READY=false;});
   }
   function showApp() {$('auth-page').hidden=true;$('app-page').hidden=false;refreshRiders().catch(e=>notify(e.message,true));updateSummary();}
   function setupListeners() {
