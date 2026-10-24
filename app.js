@@ -1,4 +1,4 @@
-/* LK MULTIMIDIA | Contas reais somente com API local segura. */
+/* LK MULTIMIDIA | Cadastro cloud: habilitar so com API+SMTP reais e validados. */
 'use strict';
 (() => {
   const STORAGE_KEY = 'ipp.multimidia.v0.1.drafts';
@@ -13,7 +13,7 @@
     {name:'Violão',qty:1},{name:'Baixo',qty:1},{name:'Teclado',qty:1},{name:'Bateria',qty:1},{name:'Guitarra',qty:1}
   ];
   let activeModule = 'som', activeDraftId = null, artworkData = '', toastTimer = null;
-  const API_LOCAL=window.location.origin==='http://127.0.0.1:8787';
+  let API_READY=false; // O backend só libera contas quando a configuração real estiver operacional.
   let cloudRiders=[],pendingEmail='';
   const workspaces = {};
   const $ = selectors;
@@ -27,9 +27,9 @@
   function toSafeString(v) { return v == null ? '' : String(v); }
   function escapeHTML(value) { return toSafeString(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
   async function api(url,method='GET',body){
-    if(!API_LOCAL)throw new Error('Acesso às contas disponível somente pela instalação local da LK.');
+    if(!API_READY)throw new Error('Contas LK ainda indisponíveis: conexão segura com a API não está pronta.');
     let r;try{r=await fetch(url,{method,credentials:'same-origin',headers:body?{'Content-Type':'application/json'}:{},body:body?JSON.stringify(body):undefined,cache:'no-store'});}
-    catch{throw new Error('Servidor LK indisponível neste computador.');}
+    catch{throw new Error('Não foi possível conectar à API da LK.');}
     let data={};try{data=await r.json();}catch{}
     if(!r.ok)throw new Error(data.error||'Operação não concluída.');
     return data;
@@ -206,7 +206,7 @@
     $('register-back-login').addEventListener('click',()=>showRegister(false));
     $('verification-back').addEventListener('click',()=>{$('register-form-step').hidden=false;$('register-verification-step').hidden=true;});
     $('register-form').addEventListener('submit',async e=>{
-      e.preventDefault();if(!API_LOCAL)return;
+      e.preventDefault();if(!API_READY)return;
       const f=$('register-form');if(!f.reportValidity())return;
       const password=$('register-password').value,passwordConfirm=$('register-password-confirm').value;
       $('register-error').textContent='';
@@ -232,7 +232,7 @@
       catch(err){$('verify-error').textContent=err.message;}
     });
     $('login-form').addEventListener('submit',async e=>{
-      e.preventDefault();if(!API_LOCAL)return;
+      e.preventDefault();if(!API_READY)return;
       const btn=$('login-form').querySelector('[type=submit]');btn.disabled=true;$('login-error').textContent='';
       try{
         await api('/api/auth/login','POST',{email:$('login-email').value,password:$('login-password').value});
@@ -244,20 +244,32 @@
       try{await api('/api/auth/logout','POST',{});}catch{}
       cloudRiders=[];$('app-page').hidden=true;$('auth-page').hidden=false;showRegister(false);$('login-password').value='';
     });
-    if(!API_LOCAL){
-      $('account-status').textContent='Acesso às contas disponível na instalação local da LK.';
-      $('login-email').disabled=true;$('login-password').disabled=true;
-      $('login-form').querySelector('[type=submit]').disabled=true;$('show-register').disabled=true;
-    }else{
-      $('login-email').disabled=false;$('login-password').disabled=false;
-      $('login-form').querySelector('[type=submit]').disabled=false;
-      $('account-status').textContent='Entre ou crie sua conta com seu e-mail.';
-      api('/health').then(h=>{
-        $('show-register').disabled=!h.smtpReady;
-        if(!h.smtpReady)$('account-status').textContent='A confirmação por e-mail ainda não está configurada. O cadastro será liberado quando estiver disponível.';
-      }).catch(err=>{$('account-status').textContent=err.message;$('show-register').disabled=true;});
-      api('/api/me').then(()=>showApp()).catch(()=>{});
-    }
+    // O acesso cloud nunca é liberado pelo frontend sozinho: depende da API.
+    $('login-email').disabled=true;$('login-password').disabled=true;
+    $('login-form').querySelector('[type=submit]').disabled=true;
+    $('show-register').disabled=true;
+    $('account-status').textContent='Verificando disponibilidade do cadastro LK...';
+    fetch('/health',{method:'GET',cache:'no-store',credentials:'same-origin'})
+      .then(async response=>{
+        if(!response.ok)throw Error('API indisponível');
+        return response.json();
+      })
+      .then(health=>{
+        if(health.authEnabled!==true)throw Error('Cadastro em preparação');
+        API_READY=true;
+        $('login-email').disabled=false;$('login-password').disabled=false;
+        $('login-form').querySelector('[type=submit]').disabled=false;
+        $('show-register').disabled=health.smtpReady!==true;
+        $('account-status').textContent=health.smtpReady===true
+          ? 'Entre ou crie sua conta com Gmail, Hotmail ou outro e-mail válido.'
+          : 'Login disponível; cadastro aguardando configuração do envio de e-mail.';
+        api('/api/me').then(()=>showApp()).catch(()=>{});
+      })
+      .catch(()=>{
+        API_READY=false;
+        $('account-status').textContent='O cadastro LK ainda não está disponível. O site permanece acessível para consulta.';
+        $('show-register').disabled=true;
+      });
   }
   function showApp() {$('auth-page').hidden=true;$('app-page').hidden=false;refreshRiders().catch(e=>notify(e.message,true));updateSummary();}
   function setupListeners() {
