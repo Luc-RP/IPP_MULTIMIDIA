@@ -249,6 +249,8 @@
       $('login-email').disabled=true;$('login-password').disabled=true;
       $('login-form').querySelector('[type=submit]').disabled=true;$('show-register').disabled=true;
     }else{
+      $('login-email').disabled=false;$('login-password').disabled=false;
+      $('login-form').querySelector('[type=submit]').disabled=false;
       $('account-status').textContent='Entre ou crie sua conta com seu e-mail.';
       api('/health').then(h=>{
         $('show-register').disabled=!h.smtpReady;
