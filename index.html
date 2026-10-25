@@ -43,8 +43,8 @@
             <p class="muted">Preencha seus dados e confirme seu e-mail para ativar o plano Free.</p>
             <form id="register-form" autocomplete="off">
               <fieldset class="account-type-choice"><legend>Tipo de conta</legend>
-               <label><input type="radio" name="accountType" value="personal" checked><span><b>Pessoal</b><small>Organize seus próprios documentos.</small></span></label>
-               <label><input type="radio" name="accountType" value="organization"><span><b>Organização</b><small>Identifique os documentos com sua organização.</small></span></label>
+               <label><input type="radio" id="account-type-personal" name="accountType" value="personal" checked><span><b>Pessoal</b><small>Organize seus próprios documentos.</small></span></label>
+               <label><input type="radio" id="account-type-organization" name="accountType" value="organization"><span><b>Organização</b><small>Identifique os documentos com sua organização.</small></span></label>
              </fieldset>
              <div class="register-field" id="register-org-field" hidden><label for="register-org-name">Nome da organização</label><input id="register-org-name" name="organizationName" maxlength="120" minlength="2" placeholder="Nome da organização"></div>
              <div class="register-field"><label for="register-name">Nome completo</label><input id="register-name" name="name" type="text" required minlength="3" maxlength="100" autocomplete="name" placeholder="Seu nome completo"></div>
