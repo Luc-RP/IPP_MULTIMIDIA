@@ -7,8 +7,8 @@
   <meta name="description" content="LK Multimídia | Formulários técnicos para som, luz e imagem." />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob:; script-src 'self'; style-src 'self' https://fonts.googleapis.com; img-src 'self' data: blob:; font-src 'self' https://fonts.gstatic.com; object-src 'none'; base-uri 'none'; form-action 'self'; connect-src 'self'" />
   <link rel="icon" href="assets/lk-brand-studio.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="styles.css?v=0.8.0" />
-  <link rel="stylesheet" href="brand-lk.css?v=0.8.0" />
+  <link rel="stylesheet" href="styles.css?v=0.8.1" />
+  <link rel="stylesheet" href="brand-lk.css?v=0.8.1" />
   <title>LK Multimídia | Central Técnica</title>
 </head>
 <body data-auth-loading="true">
@@ -102,10 +102,21 @@
             <form id="rider-form" novalidate>
               <div class="paper-content">
                 <div class="form-section"><div class="form-section-title"><span class="section-num">01</span><div><b>Identificação do evento</b><small>Informações gerais do rider</small></div></div>
-                  <div class="fields-grid two"><div class="field"><label for="event-type">Tipo de evento</label><select id="event-type" name="eventType"><option>Evento</option><option>Vigília</option><option>Congresso</option><option>Conferência</option><option>Social</option><option>Outro</option></select></div><div class="field"><label for="event-year">Ano do evento</label><select id="event-year" name="year"><option>2026</option><option>2027</option><option>2028</option><option>2029</option><option>2030</option></select></div></div>
+                  <div class="fields-grid two"><div class="field"><label for="event-type">Tipo de evento</label><select id="event-type" name="eventType"><option>Evento</option><optgroup label="Música e apresentações"><option>Show / concerto</option><option>Festival</option><option>Apresentação acústica</option><option>Teatro / espetáculo</option><option>Apresentação cultural</option></optgroup><optgroup label="Igrejas e conferências"><option>Culto / celebração</option><option>Vigília</option><option>Congresso</option><option>Conferência</option><option>Retiro / encontro</option></optgroup><optgroup label="Corporativos e educação"><option>Evento corporativo</option><option>Seminário</option><option>Workshop</option><option>Feira / exposição</option><option>Formatura</option></optgroup><optgroup label="Eventos sociais e produções"><option>Social</option><option>Casamento</option><option>Evento esportivo</option><option>Transmissão ao vivo</option><option>Gravação ao vivo</option></optgroup><option>Outro</option></select></div><div class="field"><label for="event-year">Ano do evento</label><select id="event-year" name="year"><option>2026</option><option>2027</option><option>2028</option><option>2029</option><option>2030</option></select></div></div>
                   <div class="fields-grid two vigil-years" id="vigil-years" hidden><div class="field"><label for="year-start">Ano inicial</label><select id="year-start" name="yearStart"><option>2026</option><option>2027</option><option>2028</option><option>2029</option><option>2030</option></select></div><div class="field"><label for="year-end">→ Ano final</label><select id="year-end" name="yearEnd"><option>2027</option><option>2028</option><option>2029</option><option>2030</option><option>2031</option></select></div></div>
                   <div class="field"><label for="organization-name">Nome da organização <span class="optional">(opcional)</span></label><input id="organization-name" name="organizationName" maxlength="120" placeholder="Nome da empresa, grupo ou produção"></div><div class="field"><label for="event-name">Nome do evento <span class="req">*</span></label><input id="event-name" name="eventName" maxlength="130" placeholder="Ex.: Congresso Nacional" required></div>
                   <div class="fields-grid two"><div class="field"><label for="event-date">Data</label><input id="event-date" name="eventDate" type="date"></div><div class="field"><label for="event-location">Local</label><input id="event-location" name="location" maxlength="100" placeholder="Ex.: Centro de Convenções"></div></div>
+                  <div class="production-optional">
+                    <div class="production-optional-title"><strong>Informações da produção</strong><small>Opcional · útil para dimensionar a operação técnica</small></div>
+                    <div class="fields-grid two">
+                      <div class="field"><label for="production-scale">Porte do evento</label><select id="production-scale" name="productionScale"><option value="">Não informado</option><option>Pequeno porte</option><option>Médio porte</option><option>Grande porte</option><option>Festival / múltiplos palcos</option></select></div>
+                      <div class="field"><label for="attendance-estimate">Público estimado</label><input id="attendance-estimate" name="attendanceEstimate" type="number" min="0" max="1000000" placeholder="Ex.: 500"></div>
+                    </div>
+                    <div class="fields-grid two">
+                      <div class="field"><label for="stage-dimensions">Dimensões do palco (m)</label><input id="stage-dimensions" name="stageDimensions" maxlength="50" placeholder="Ex.: 8 x 6"></div>
+                      <div class="field"><label for="soundcheck-minutes">Passagem de som (minutos)</label><input id="soundcheck-minutes" name="soundcheckMinutes" type="number" min="0" max="1440" placeholder="Ex.: 45"></div>
+                    </div>
+                  </div>
                   <div class="field" hidden><label for="artwork">Arte de identidade visual <span class="optional">OPCIONAL</span></label><div class="upload-box"><input id="artwork" type="file" accept="image/png,image/jpeg,image/webp" disabled aria-describedby="artwork-help"/><div class="upload-label"><span>▧</span><div><b>Anexar imagem do evento</b><small id="artwork-help">Imagem do evento.</small></div></div><button type="button" class="text-button" id="remove-artwork" hidden>Remover imagem</button></div><img id="artwork-preview" alt="Prévia da arte do evento" class="artwork-preview" hidden></div>
                 </div>
                 <div class="form-section" data-section="som"><div class="form-section-title"><span class="section-num">02</span><div><b>Sistema principal · P.A.</b><small>Equipamentos e cobertura sonora</small></div></div>
@@ -159,6 +170,6 @@
    </div>
    <div id="print-root" aria-hidden="true"></div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="app.js?v=0.8.0" defer></script>
+  <script src="app.js?v=0.8.1" defer></script>
 </body>
 </html>
