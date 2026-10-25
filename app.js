@@ -333,6 +333,8 @@
     return `<table class="print-technical-table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
   };
   function generatePrintMarkup(d) {
+    let sectionIndex=1;
+    const nextSection=()=>String(sectionIndex++).padStart(2,'0');
     const description=definitions[activeModule];
     const year=d.eventType==='Vigília'?`${d.yearStart} → ${d.yearEnd}`:(d.eventDate?d.eventDate.slice(0,4):d.year);
     const productionFields=[
@@ -344,24 +346,24 @@
     const productionExtra=productionFields.length
       ?`<div class="print-subgroup"><h4>Planejamento técnico</h4><div class="print-pairs">${productionFields.map(([label,value])=>printedPair(label,value)).join('')}</div></div>`
       :'';
-    let html=section('01','Identificação do evento',`<div class="print-pairs">${d.organizationName?.trim()?printedPair('Organização',d.organizationName):''}${printedPair('Tipo de evento',d.eventType==='Outro'?eventDisplayName(d):d.eventType)}${printedPair('Ano / período',year)}${printedPair('Nome do evento',d.eventName)}${printedPair('Data',d.eventDate?new Date(`${d.eventDate}T12:00:00`).toLocaleDateString('pt-BR'):'Não informada')}${printedPair('Local',d.location)}</div>${productionExtra}${d.artwork?`<div class="print-field" style="margin-top:5mm"><small>Arte de identidade visual</small><img class="print-art" src="${d.artwork}" alt="Arte do evento" /></div>`:''}`);
+    let html=section(nextSection(),'Identificação do evento',`<div class="print-pairs">${d.organizationName?.trim()?printedPair('Organização',d.organizationName):''}${printedPair('Tipo de evento',d.eventType==='Outro'?eventDisplayName(d):d.eventType)}${printedPair('Ano / período',year)}${printedPair('Nome do evento',d.eventName)}${printedPair('Data',d.eventDate?new Date(`${d.eventDate}T12:00:00`).toLocaleDateString('pt-BR'):'Não informada')}${printedPair('Local',d.location)}</div>${productionExtra}${d.artwork?`<div class="print-field" style="margin-top:5mm"><small>Arte de identidade visual</small><img class="print-art" src="${d.artwork}" alt="Arte do evento" /></div>`:''}`);
     if(activeModule==='som') {
-      html+=section('02','Sistema principal · P.A.',`<div class="print-pairs">${printedPair('Mesa de som',d.console)}${printedPair('Modelo adicional',d.consoleOther)}${printedPair('Caixas principais',d.speakerModel)}${printedPair('Tipo de sistema',d.speakerType)}${printedPair('Quantidade de caixas',d.speakerQty)}${printedPair('Subwoofers',d.subQty)}${printedPair('Monitores de chão',d.monitorQty)}</div>${d.paNotes?printedNotes(d.paNotes):''}`);
+      html+=section(nextSection(),'Sistema principal · P.A.',`<div class="print-pairs">${printedPair('Mesa de som',d.console)}${printedPair('Modelo adicional',d.consoleOther)}${printedPair('Caixas principais',d.speakerModel)}${printedPair('Tipo de sistema',d.speakerType)}${printedPair('Quantidade de caixas',d.speakerQty)}${printedPair('Subwoofers',d.subQty)}${printedPair('Monitores de chão',d.monitorQty)}</div>${d.paNotes?printedNotes(d.paNotes):''}`);
       const instruments=(d.instruments||[]).map(i=>`<div class="print-item"><span>${escapeHTML(i.name)}</span><strong>${escapeHTML(i.qty)} un.</strong></div>`).join('')||'<p>Nenhum instrumento adicionado.</p>';
-      html+=section('03','Formação da banda',`<div class="print-list">${instruments}</div><div class="print-pairs print-vocals">${printedPair('Cantores principais',d.leadSingers)}${printedPair('Backing vocals',d.backSingers)}</div>`);
-      html+=section('04','Patch e monitoração',`<div class="print-pairs">${printedPair('Canais de entrada (estimativa)',d.inputCount)}${printedPair('Vias de monitoração',d.auxCount)}${printedPair('Tipo de monitoração',d.monitorType)}</div>${printedNotes(d.patchNotes)}`);
+      html+=section(nextSection(),'Formação da banda',`<div class="print-list">${instruments}</div><div class="print-pairs print-vocals">${printedPair('Cantores principais',d.leadSingers)}${printedPair('Backing vocals',d.backSingers)}</div>`);
+      html+=section(nextSection(),'Patch e monitoração',`<div class="print-pairs">${printedPair('Canais de entrada (estimativa)',d.inputCount)}${printedPair('Vias de monitoração',d.auxCount)}${printedPair('Tipo de monitoração',d.monitorType)}</div>${printedNotes(d.patchNotes)}`);
       const inputRows=(Array.isArray(d.inputList)?d.inputList:[]).map(item=>{const x=item||{};return [x.channel||'',x.source||'',x.microphone||'',x.stand||'',x.phantom?'Sim':'Não',x.notes||''];});
       const outputRows=(Array.isArray(d.outputList)?d.outputList:[]).map(item=>{const x=item||{};return [x.bus||'',x.destination||'',x.kind||'',x.connection||'',x.notes||''];});
       const checklistRows=(Array.isArray(d.technicalChecklist)?d.technicalChecklist:[]).map(item=>{const x=item||{};return [x.done?'Concluído':'Pendente',x.group||'',x.label||''];});
-      html+=section('05','Input List · Canais de entrada',printTechnicalTable(['CH','Fonte','Mic / DI','Pedestal','48V','Notas'],inputRows),{table:true});
-      html+=section('06','Output List · Saídas',printTechnicalTable(['Via','Destino','Tipo','Conexão','Notas'],outputRows),{table:true});
-      html+=section('07','Checklist técnico',printTechnicalTable(['Estado','Etapa','Verificação'],checklistRows),{table:true});
+      if(inputRows.length)html+=section(nextSection(),'Input List · Canais de entrada',printTechnicalTable(['CH','Fonte','Mic / DI','Pedestal','48V','Notas'],inputRows),{table:true});
+      if(outputRows.length)html+=section(nextSection(),'Output List · Saídas',printTechnicalTable(['Via','Destino','Tipo','Conexão','Notas'],outputRows),{table:true});
+      if(checklistRows.length)html+=section(nextSection(),'Checklist técnico',printTechnicalTable(['Estado','Etapa','Verificação'],checklistRows),{table:true});
     } else if(activeModule==='luz') {
-      html+=section('02','Iluminação',`<div class="print-pairs">${printedPair('Controladora',d.lightConsole)}${printedPair('Quantidade de refletores',d.lightQty)}${printedPair('Tipo principal',d.lightType)}${printedPair('Controle de sinal',d.lightControl)}</div>${printedNotes(d.lightNotes)}`);
+      html+=section(nextSection(),'Iluminação',`<div class="print-pairs">${printedPair('Controladora',d.lightConsole)}${printedPair('Quantidade de refletores',d.lightQty)}${printedPair('Tipo principal',d.lightType)}${printedPair('Controle de sinal',d.lightControl)}</div>${printedNotes(d.lightNotes)}`);
     } else {
-      html+=section('02','Imagem e vídeo',`<div class="print-pairs">${printedPair('Quantidade de câmeras',d.cameraQty)}${printedPair('Resolução',d.videoOutput)}${printedPair('Mesa / switcher',d.videoSwitcher)}${printedPair('Saída principal',d.streamTarget)}</div>${printedNotes(d.videoNotes)}`);
+      html+=section(nextSection(),'Imagem e vídeo',`<div class="print-pairs">${printedPair('Quantidade de câmeras',d.cameraQty)}${printedPair('Resolução',d.videoOutput)}${printedPair('Mesa / switcher',d.videoSwitcher)}${printedPair('Saída principal',d.streamTarget)}</div>${printedNotes(d.videoNotes)}`);
     }
-    html+=section(activeModule==='som'?'08':'03','Responsáveis e observações',`<div class="print-pairs">${printedPair('Responsável técnico',d.contactName)}${printedPair('Função',d.contactRole)}${printedPair('E-mail',d.contactEmail)}${printedPair('Telefone',d.contactPhone)}</div>${printedNotes(d.generalNotes)}`);
+    html+=section(nextSection(),'Responsáveis e observações',`<div class="print-pairs">${printedPair('Responsável técnico',d.contactName)}${printedPair('Função',d.contactRole)}${printedPair('E-mail',d.contactEmail)}${printedPair('Telefone',d.contactPhone)}</div>${printedNotes(d.generalNotes)}`);
     const documentTitle=escapeHTML(d.eventName);
     const printRoot=$('print-root');
     printRoot.innerHTML=`<div class="print-cover"><div><div class="print-over">${escapeHTML((d.organizationName||"").trim()||"IDENTIFICAÇÃO DO EVENTO")}</div><h1>RIDER TÉCNICO</h1><h2>${escapeHTML(description.hero)}</h2><div class="print-line"></div><strong class="print-event-name">${escapeHTML(eventDisplayName(d))}</strong><small>${escapeHTML(eventPeriod(d))}</small></div></div><div class="print-body">${html}<div class="print-bottom"><span>${escapeHTML(description.print)}</span><span>${documentTitle} · ${escapeHTML(eventPeriod(d))}</span></div></div>`;
