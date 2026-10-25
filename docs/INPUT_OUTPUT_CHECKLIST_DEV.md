@@ -2,7 +2,7 @@
 
 **Branch:** feat/input-output-checklists
 **Base:** main do frontend em 25/10/2026, commit 1cfee94e77bd944bd3ec2e15a8c66fb5d67c3ffc.
-**Status:** em desenvolvimento; não publicado em produção.
+**Status:** v0.8.1 já publicada na Vercel; ajustes seguintes são incrementais.
 
 ## Objetivo
 Substituir a descrição livre do patch por listas estruturadas, editáveis e imprimíveis. Recursos adicionados apenas ao Rider de SOM, sem mudar a lógica das telas de luz/imagem nem das contas.
@@ -33,3 +33,6 @@ Captura do Brave no Android mostra login cortado à direita, marca no fundo parc
 ## 25/10/2026 — PDF oficial e opções de evento v0.8.1
 Exemplo real enviado pelo responsável: PDF A4 com cabeçalho 78 mm e seção 03 dividida entre folhas; segunda folha com enorme espaço vazio. CSS original tinha `.print-section{break-inside:avoid}` indiscriminado e `print-cover` alto, sem estilos separados para tabelas longas. Ajustado modelo de exportação navegador em brand-lk.css (print) com capa ~compacta (padding 10/9 mm), menor distância vertical de títulos sem prejudicar leitura, margens laterais de 14 mm, blocos compactos sem quebra, tabelas longas podem continuar com thead repetido, tr sem corte. Não gera PDF manual.
 Adicionadas categorias de evento (shows, festival, cultos, encontros, teatro, social, corporativo, esporte, online); campos opcionais porte, público, dimensões do palco e passagem de som, exibidos no PDF só quando preenchidos. Input/Output List vazias não criam páginas sem conteúdo; numeração de seções do PDF adaptativa. Arquivos carregados com cache bust v0.8.1. Fontes de pesquisa: Yamaha Pro Audio (soundcheck/input list), Molly Tuttle Advance (riders distintos por tamanho), Radovan Tariska club/festival, BandsManager, Stage Plot Forge. NÃO copiar design nem trechos de terceiros.
+
+## 25/10/2026 — QA da geração automática de canais (incremental)
+O gerador anterior ignorava a quantidade configurada de cantores principais/backing vocals e gerava overheads condensadores de bateria com +48V desmarcado por padrão. O botão Adicionar canal também usava total de linhas+1, podendo repetir um número se o técnico removesse uma linha intermediária. A nova lógica considera os campos de vocalistas, sinaliza overheads condensadores como phantom sugerido (+48V; confirmar modelo na observação) e encontra o menor canal positivo não utilizado ao adicionar manualmente. Gerar sugestão continua sem sobrescrever patch manual. Testes executados sobre os builders, serialização/restauração e IDs reais do HTML; teste manual da produção permanece responsabilidade do responsável.

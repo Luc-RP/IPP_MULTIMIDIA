@@ -39,7 +39,11 @@ test('CSS versionado, formulário e arrays técnicos continuam no HTML', () => {
 
 test('HTML sem ids duplicados e script principal sem erros de sintaxe', () => {
   const html=read('index.html'),js=read('app.js');
-  const ids=[...html.matchAll(/\\bid="([^"]+)"/g)].map(x=>x[1]);
+  const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(x=>x[1]);
+  assert.ok(ids.length>=100,'A verificação precisa encontrar os IDs reais do documento');
   assert.equal(new Set(ids).size,ids.length);
+  const idsReferenciados=[...js.matchAll(/\$\('([^']+)'\)/g)].map(match=>match[1]);
+  assert.ok(idsReferenciados.length>=35,'A verificação precisa encontrar referências do JavaScript');
+  for(const id of idsReferenciados) assert.ok(ids.includes(id),'ID sem elemento HTML: '+id);
   assert.doesNotThrow(()=>new Function(js));
 });

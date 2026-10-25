@@ -171,15 +171,25 @@
       .slice(0,limits.checklist).forEach(row=>appendBuilder('checklist',row));
     updateBuilderCounts();
   }
+  function appendNextInputChannel(){
+    const used=new Set(readBuilder('input-list')
+      .map(row=>Number(row.channel))
+      .filter(channel=>Number.isInteger(channel)&&channel>0));
+    let channel=1;
+    while(used.has(channel))channel++;
+    appendBuilder('input',{channel:String(channel).padStart(2,'0')});
+  }
   function generateInputsFromInstruments(){
     if(readBuilder('input-list').length){
       notify('Para evitar duplicidades, gere a sugestão antes de adicionar canais manualmente.',true);return;
     }
     const all=readInstruments();
-    if(!all.length){notify('Inclua instrumentos na formação antes de gerar o patch.',true);return;}
+    const singers=Math.max(0,Math.min(10,Number($('lead-singers').value)||0));
+    const backing=Math.max(0,Math.min(10,Number($('back-singers').value)||0));
+    if(!all.length&&!singers&&!backing){notify('Informe instrumentos ou vocalistas antes de gerar o patch.',true);return;}
     const channels=[];
-    const add=(source,microphone='A definir',category='Instrumento')=>{
-      if(channels.length<limits.input)channels.push({channel:String(channels.length+1).padStart(2,'0'),category,source,microphone,stand:'A definir',phantom:false,notes:''});
+    const add=(source,microphone='A definir',category='Instrumento',phantom=false,notes='')=>{
+      if(channels.length<limits.input)channels.push({channel:String(channels.length+1).padStart(2,'0'),category,source,microphone,stand:'A definir',phantom,notes});
     };
     for(const instrument of all){
       const name=String(instrument.name||'').trim();
@@ -188,13 +198,16 @@
         const label=quantity>1?name+' '+i:name;
         const normalized=name.toLocaleLowerCase('pt-BR');
         if(/bateria/.test(normalized)){
-          for(const [part,mic] of [['Bumbo','Dinâmico'],['Caixa','Dinâmico'],['Tom','Dinâmico'],['Over L','Condensador'],['Over R','Condensador']])add(label+' · '+part,mic);
+          for(const [part,mic] of [['Bumbo','Dinâmico'],['Caixa','Dinâmico'],['Tom','Dinâmico'],['Over L','Condensador'],['Over R','Condensador']])
+            add(label+' · '+part,mic,'Instrumento',mic==='Condensador',mic==='Condensador'?'Confirmar modelo e necessidade de +48V.':'');
         }else if(/teclado|piano|sintetizador/.test(normalized)){
           add(label+' · L','DI');add(label+' · R','DI');
         }else if(/violão|baixo|contrabaixo/.test(normalized)){add(label,'DI');}
         else add(label);
       }
     }
+    for(let i=1;i<=singers;i++)add('Voz principal '+i,'Dinâmico vocal','Voz');
+    for(let i=1;i<=backing;i++)add('Backing vocal '+i,'Dinâmico vocal','Voz');
     channels.forEach(row=>appendBuilder('input',row));
     if(channels.length===limits.input)notify('Lista limitada a 96 canais. Revise o patch manualmente.',true);
     else notify('Sugestão de Input List criada. Revise os microfones e numeração.');
@@ -529,10 +542,7 @@
     for(const b of document.querySelectorAll('.nav-item'))b.addEventListener('click',()=>setModule(b.dataset.module));
     for(const id of ['new-rider','new-draft-side'])$(id).addEventListener('click',makeNew);
     $('add-instrument').addEventListener('click',()=>{appendInstrument();updateSummary();});
-    $('add-input-channel').addEventListener('click',()=>{
-      const count=readBuilder('input-list').length;
-      appendBuilder('input',{channel:String(count+1).padStart(2,'0')});
-    });
+    $('add-input-channel').addEventListener('click',appendNextInputChannel);
     $('generate-inputs').addEventListener('click',generateInputsFromInstruments);
     $('add-output-channel').addEventListener('click',()=>appendBuilder('output'));
     $('add-checklist-item').addEventListener('click',()=>appendBuilder('checklist'));
