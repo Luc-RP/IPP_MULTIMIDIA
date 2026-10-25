@@ -23,3 +23,6 @@ Substituir a descrição livre do patch por listas estruturadas, editáveis e im
 4. Não fazer deploy na Vercel antes de concluir os gates e revisar o impacto no bundle frontend.
 
 **Sem modificações** em produção Vercel, API, Aiven, autenticação, LK_ADM ou banco.
+
+## Limite de tamanho e sanitização
+O backend API histórico (schema em src/security.js v0.6.3) limita o `content` JSON a 64 KiB e a requisição a 80 KiB. Pré-validação no frontend rejeita um rider acima de 64 KiB com mensagem compreensível, sem enviar dados excessivos. Impressão usa escapeHTML para todos os campos listados; arrays de legado têm verificação Array.isArray e itens null são tolerados.

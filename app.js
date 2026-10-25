@@ -123,6 +123,7 @@
     $('checklist-progress').textContent=done+' de '+items.length+' concluídos';
   }
   function appendBuilder(kind,data={}){
+    if(!data || typeof data!=='object' || Array.isArray(data))data={};
     const spec={
       input:{id:'input-list',classes:'input-channel-row',columns:[
         ['Canal','channel',String(data.channel||'')],
@@ -295,6 +296,9 @@
     const d=capture(),payload={category:activeModule,title:d.eventName||'Rider técnico',eventYear:d.eventType==='Vigília'?d.yearStart:(d.eventDate?d.eventDate.slice(0,4):d.year),content:{...d,artwork:''}};
     const btn=$('save-btn');btn.disabled=true;
     try{
+      if(new TextEncoder().encode(JSON.stringify(payload.content)).length>64*1024){
+        throw new Error('Rider acima de 64 KiB. Reduza as observações ou a quantidade de itens antes de salvar.');
+      }
       const resp=await api(activeDraftId?'/api/riders/'+encodeURIComponent(activeDraftId):'/api/riders',activeDraftId?'PUT':'POST',payload);
       if(!activeDraftId)activeDraftId=String(resp.id);
       await refreshRiders();$('last-saved').textContent='Salvo na sua conta';notify('Rider salvo.');
@@ -337,9 +341,9 @@
       const instruments=(d.instruments||[]).map(i=>`<div class="print-item"><span>${escapeHTML(i.name)}</span><strong>${escapeHTML(i.qty)} un.</strong></div>`).join('')||'<p>Nenhum instrumento adicionado.</p>';
       html+=section('03','Formação da banda',`<div class="print-list">${instruments}</div><div class="print-pairs" style="margin-top:6mm">${printedPair('Cantores principais',d.leadSingers)}${printedPair('Backing vocals',d.backSingers)}</div>`);
       html+=section('04','Patch e monitoração',`<div class="print-pairs">${printedPair('Canais de entrada (estimativa)',d.inputCount)}${printedPair('Vias de monitoração',d.auxCount)}${printedPair('Tipo de monitoração',d.monitorType)}</div>${printedNotes(d.patchNotes)}`);
-      const inputRows=(d.inputList||[]).map(x=>[x.channel||'',x.source||'',x.microphone||'',x.stand||'',x.phantom?'Sim':'Não',x.notes||'']);
-      const outputRows=(d.outputList||[]).map(x=>[x.bus||'',x.destination||'',x.kind||'',x.connection||'',x.notes||'']);
-      const checklistRows=(d.technicalChecklist||[]).map(x=>[x.done?'Concluído':'Pendente',x.group||'',x.label||'']);
+      const inputRows=(Array.isArray(d.inputList)?d.inputList:[]).map(item=>{const x=item||{};return [x.channel||'',x.source||'',x.microphone||'',x.stand||'',x.phantom?'Sim':'Não',x.notes||''];});
+      const outputRows=(Array.isArray(d.outputList)?d.outputList:[]).map(item=>{const x=item||{};return [x.bus||'',x.destination||'',x.kind||'',x.connection||'',x.notes||''];});
+      const checklistRows=(Array.isArray(d.technicalChecklist)?d.technicalChecklist:[]).map(item=>{const x=item||{};return [x.done?'Concluído':'Pendente',x.group||'',x.label||''];});
       html+=section('05','Input List · Canais de entrada',printTechnicalTable(['CH','Fonte','Mic / DI','Pedestal','48V','Notas'],inputRows));
       html+=section('06','Output List · Saídas',printTechnicalTable(['Via','Destino','Tipo','Conexão','Notas'],outputRows));
       html+=section('07','Checklist técnico',printTechnicalTable(['Estado','Etapa','Verificação'],checklistRows));
