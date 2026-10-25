@@ -14,7 +14,7 @@
   ];
   let activeModule = 'som', activeDraftId = null, artworkData = '', toastTimer = null;
   let API_READY=false; // O backend só libera contas quando a configuração real estiver operacional.
-  let cloudRiders=[],pendingEmail='';
+  let cloudRiders=[],pendingEmail='',signupOrganizationName='',profileUser=null;
   const workspaces = {};
   const $ = selectors;
 
@@ -65,7 +65,7 @@
   }
   function defaultData(module=activeModule) {
     const result={}; new FormData(form).forEach((value,key)=>{if(typeof value==='string')result[key]=value;});
-    result.eventName='';result.organizationName='';result.location='';result.eventDate='';result.eventType='Evento';result.year='2026';result.yearStart='2026';result.yearEnd='2027';
+    result.eventName='';result.organizationName=signupOrganizationName;result.location='';result.eventDate='';result.eventType='Evento';result.year='2026';result.yearStart='2026';result.yearEnd='2027';
     result.instruments = module==='som' ? starterInstruments.map(x=>({...x})) : [];
     result.artwork='';result.module=module;return result;
   }
@@ -130,7 +130,7 @@
     $('last-section-number').textContent=activeModule==='som'?'05':'03';
     $('last-saved').textContent='Ainda não salvo';
     if(restoreWorking && workspaces[next])restore(workspaces[next]);else restore(defaultData(next));
-    window.scrollTo({top:0,behavior:'smooth'});
+    $('main-area').scrollTo({top:0,behavior:'smooth'});
   }
   function makeNew() {
     if(!confirm('Criar novo rider? Alterações não salvas deste formulário serão descartadas.'))return;
@@ -222,10 +222,19 @@
       $('register-form-step').hidden=false;$('register-verification-step').hidden=true;
       $('register-error').textContent='';$('verify-error').textContent='';
       if(enabled)$('account-status').hidden=true;
+      if(enabled){$('account-type-personal').checked=true;syncAccountType();}
       registrationVisibility.checked=false;
       $('register-password').type='password';
       $('register-password-confirm').type='password';
     }
+    function syncAccountType(){
+      const organizational=$('account-type-organization').checked;
+      $('register-org-field').hidden=!organizational;
+      $('register-org-name').required=organizational;
+      if(!organizational)$('register-org-name').value='';
+    }
+    document.querySelectorAll('input[name="accountType"]').forEach(el=>el.addEventListener('change',syncAccountType));
+    syncAccountType();
     const registrationVisibility=$('register-show-password');
     registrationVisibility.addEventListener('change',()=>{
       const visible=registrationVisibility.checked;
@@ -242,9 +251,12 @@
       $('register-error').textContent='';
       if(password!==passwordConfirm){$('register-error').textContent='As senhas não coincidem.';return;}
       const email=$('register-email').value.trim().toLowerCase();
+      const organizationSelected=$('account-type-organization').checked;
+      const organizationValue=organizationSelected?$('register-org-name').value.trim():'';
       const btn=f.querySelector('[type=submit]');btn.disabled=true;
       try{
         await api('/api/auth/register','POST',{fullName:$('register-name').value.trim(),email,phone:$('register-phone').value,password,passwordConfirm});
+        signupOrganizationName=organizationValue;
         pendingEmail=email;f.reset();$('register-form-step').hidden=true;$('register-verification-step').hidden=false;
         $('register-verification-code').value='';$('verify-error').textContent='Confira sua caixa de entrada e o spam.';
       }catch(err){$('register-error').textContent=err.message;}finally{btn.disabled=false;}
@@ -266,13 +278,13 @@
       const btn=$('login-form').querySelector('[type=submit]');btn.disabled=true;$('login-error').textContent='';
       try{
         await api('/api/auth/login','POST',{email:$('login-email').value,password:$('login-password').value});
-        await api('/api/me');$('login-password').value='';showApp();
+        const session=await api('/api/me');$('login-password').value='';showApp(session.user);
       }catch(err){$('login-error').textContent=err.message;}finally{btn.disabled=false;}
     });
     $('toggle-password').addEventListener('click',()=>{$('login-password').type=$('login-password').type==='password'?'text':'password';});
     $('logout-btn').addEventListener('click',async()=>{
       try{await api('/api/auth/logout','POST',{});}catch{}
-      cloudRiders=[];$('app-page').hidden=true;$('auth-page').hidden=false;showRegister(false);$('login-password').value='';
+      cloudRiders=[];profileUser=null;signupOrganizationName='';closeProfileMenu();$('profile-modal').hidden=true;setProfilePhoto(null);$('app-page').hidden=true;$('auth-page').hidden=false;showRegister(false);$('login-password').value='';
     });
     // A disponibilidade das operações é controlada pela resposta do servidor.
     // Nunca permitir POST real até que o backend confirme authEnabled.
@@ -291,13 +303,61 @@
         API_READY=true;
         $('login-form').querySelector('[type=submit]').disabled=false;
         $('register-form').querySelector('[type=submit]').disabled=health.smtpReady!==true;
-        try{await api('/api/me');showApp();}
+        try{const session=await api('/api/me');showApp(session.user);}
         catch{/* Sessão ausente ou expirada: apresentar login normalmente. */}
       })
       .catch(()=>{API_READY=false;})
       .finally(finishSessionBoot);
   }
-  function showApp() {$('auth-page').hidden=true;$('app-page').hidden=false;refreshRiders().catch(e=>notify(e.message,true));updateSummary();}
+  function setProfilePhoto(data){
+    document.querySelectorAll('.profile-photo').forEach(img=>{img.src=data||'';img.hidden=!data;});
+    document.querySelectorAll('.profile-initials').forEach(el=>{el.hidden=!!data;});
+  }
+  function closeProfileMenu(){
+    $('profile-menu').hidden=true;$('profile-trigger').setAttribute('aria-expanded','false');
+  }
+  function updateProfile(user){
+    profileUser=user||null;
+    const name=String(user?.name||'').trim(),email=String(user?.email||'');
+    const initials=name.split(/\s+/).filter(Boolean).slice(0,2).map(part=>part[0].charAt(0).toUpperCase()).join('')||'U';
+    document.querySelectorAll('.profile-initials').forEach(el=>{el.textContent=initials;});
+    $('profile-sidebar-name').textContent=name||'Meu perfil';
+    $('profile-name').textContent=name||'Minha conta';
+    $('profile-email').textContent=email;
+    $('profile-plan').textContent='Plano '+(user?.plan==='free'?'Free':String(user?.plan||'Free'));
+    let photo=null;
+    try{if(user?.id)photo=localStorage.getItem('lk.avatar.v1:'+user.id);}catch{}
+    setProfilePhoto(photo);
+    if(signupOrganizationName&&!activeDraftId)$('organization-name').value=signupOrganizationName;
+    updateEventHeader();
+  }
+  function setupProfile(){
+    $('profile-trigger').addEventListener('click',()=>{
+      const next=$('profile-menu').hidden;
+      $('profile-menu').hidden=!next;
+      $('profile-trigger').setAttribute('aria-expanded',String(next));
+    });
+    $('profile-open').addEventListener('click',()=>{closeProfileMenu();$('profile-modal').hidden=false;$('profile-close').focus();});
+    $('profile-close').addEventListener('click',()=>{$('profile-modal').hidden=true;$('profile-trigger').focus();});
+    $('profile-modal').addEventListener('click',event=>{if(event.target===$('profile-modal'))$('profile-modal').hidden=true;});
+    document.addEventListener('click',event=>{if(!event.target.closest('.sidebar-profile-wrap'))closeProfileMenu();});
+    document.addEventListener('keydown',event=>{if(event.key==='Escape'){$('profile-modal').hidden=true;closeProfileMenu();}});
+    $('profile-photo-input').addEventListener('change',event=>{
+      const file=event.target.files?.[0];if(!file)return;
+      if(!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size>200*1024){
+        notify('Escolha uma foto JPG, PNG ou WebP até 200 KB.',true);event.target.value='';return;
+      }
+      const reader=new FileReader();
+      reader.onload=()=>{
+        const data=String(reader.result||'');if(!data.startsWith('data:image/'))return;
+        try{if(profileUser?.id)localStorage.setItem('lk.avatar.v1:'+profileUser.id,data);}
+        catch{notify('Não foi possível guardar esta foto neste navegador.',true);}
+        setProfilePhoto(data);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+  function showApp(user) {updateProfile(user);$('auth-page').hidden=true;$('app-page').hidden=false;refreshRiders().catch(e=>notify(e.message,true));updateSummary();}
   function setupListeners() {
     initializeVocals();loadInstruments(starterInstruments);restore(defaultData('som'));
     const list=document.createElement('datalist');list.id='instrument-suggestions';['Violão','Guitarra','Contrabaixo','Baixo','Teclado','Bateria','Percussão','Piano','Saxofone','Trompete','Violino','Cajón','Ukulele','Sintetizador'].forEach(v=>{const opt=document.createElement('option');opt.value=v;list.append(opt)});document.body.append(list);
@@ -314,7 +374,7 @@
     $('event-type').addEventListener('change',updateVigil);
     for(const id of ['event-year','year-start','year-end'])$(id).addEventListener('change',updateVigil);
     form.addEventListener('input',updateSummary);form.addEventListener('change',updateSummary);
-    setupImage();setupAccountForms();$('copyright-year').textContent=String(new Date().getFullYear());
+    setupImage();setupAccountForms();setupProfile();$('copyright-year').textContent=String(new Date().getFullYear());
   }
   setupListeners();
 })();
