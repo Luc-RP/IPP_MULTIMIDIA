@@ -13,6 +13,23 @@
     {name:'Violão',qty:1},{name:'Baixo',qty:1},{name:'Teclado',qty:1},{name:'Bateria',qty:1},{name:'Guitarra',qty:1}
   ];
   let activeModule = 'som', activeDraftId = null, artworkData = '', toastTimer = null;
+  const presetChecklist = [
+    {group:'Pré-produção',label:'Conferir rider e formação do evento',done:false},
+    {group:'Pré-produção',label:'Confirmar Input List e Output List com a equipe',done:false},
+    {group:'Montagem',label:'Posicionar P.A., monitores e infraestrutura de energia',done:false},
+    {group:'Montagem',label:'Identificar e testar microfones, cabos e DIs',done:false},
+    {group:'Passagem de som',label:'Conferir ganho, polaridade e phantom (+48V)',done:false},
+    {group:'Passagem de som',label:'Testar todas as vias de retorno e in-ear',done:false},
+    {group:'Passagem de som',label:'Validar nível geral e comunicação com a equipe',done:false},
+    {group:'Desmontagem',label:'Conferir e recolher equipamentos e cabos',done:false}
+  ];
+  const fieldOptions = {
+    category:['Instrumento','Voz','Playback','Ambiência','Outro'],
+    stand:['A definir','Não','Reto','Girafa','Pequeno'],
+    kind:['Monitor de chão','In-ear / fones','P.A.','Subgrave','Transmissão','Gravação','Outro'],
+    group:['Pré-produção','Montagem','Passagem de som','Desmontagem','Outro']
+  };
+  const limits = {input:96,output:64,checklist:80};
   let API_READY=false; // O backend só libera contas quando a configuração real estiver operacional.
   let cloudRiders=[],pendingEmail='',signupOrganizationName='',profileUser=null;
   const workspaces = {};
@@ -63,15 +80,139 @@
   function loadInstruments(rows) {
     $('instrument-list').replaceChildren();(Array.isArray(rows)?rows:starterInstruments).forEach(appendInstrument);updateSummary();
   }
+
+  // Listas estruturadas do rider; mantidas no JSON content do próprio documento.
+  // Não alteram o schema do MySQL nem exigem endpoints adicionais.
+  function createBuilderField(label,key,value='',options=null,kind='text',maxLength=100){
+    const wrapper=document.createElement('label');
+    wrapper.className='builder-field';
+    const title=document.createElement('span');title.textContent=label;
+    const control=options?document.createElement('select'):document.createElement('input');
+    control.dataset.col=key;
+    if(options){
+      for(const option of options){const opt=document.createElement('option');opt.value=option;opt.textContent=option;control.append(opt);}
+      if(value && !options.includes(String(value))){const opt=document.createElement('option');opt.value=String(value);opt.textContent=String(value);control.append(opt);}
+      control.value=String(value||options[0]);
+    }else if(kind==='checkbox'){
+      control.type='checkbox';control.checked=value===true||value==='true';
+    }else{
+      control.type=kind;control.maxLength=maxLength;control.value=toSafeString(value);
+      control.autocomplete='off';
+      if(kind==='number'){control.min='1';control.max='999';}
+    }
+    wrapper.append(title,control);
+    return wrapper;
+  }
+  function builderValues(row){
+    const values={};
+    row.querySelectorAll('[data-col]').forEach(control=>{
+      values[control.dataset.col]=control.type==='checkbox'?control.checked:control.value.trim();
+    });
+    return values;
+  }
+  function readBuilder(id){
+    return [...$(id).querySelectorAll('.builder-row')].map(builderValues);
+  }
+  function updateBuilderCounts(){
+    const inputs=$('input-list').querySelectorAll('.builder-row').length;
+    const outputs=$('output-list').querySelectorAll('.builder-row').length;
+    const items=readBuilder('technical-checklist');
+    const done=items.filter(item=>item.done).length;
+    $('input-list-count').textContent=inputs+' canal'+(inputs===1?'':'is');
+    $('output-list-count').textContent=outputs+' saída'+(outputs===1?'':'s');
+    $('checklist-progress').textContent=done+' de '+items.length+' concluídos';
+  }
+  function appendBuilder(kind,data={}){
+    const spec={
+      input:{id:'input-list',classes:'input-channel-row',columns:[
+        ['Canal','channel',String(data.channel||'')],
+        ['Grupo','category',data.category||'Instrumento',fieldOptions.category],
+        ['Fonte / instrumento','source',data.source||''],
+        ['Microfone / DI','microphone',data.microphone||''],
+        ['Pedestal','stand',data.stand||'A definir',fieldOptions.stand],
+        ['Phantom +48V','phantom',data.phantom===true,null,'checkbox'],
+        ['Observações','notes',data.notes||'']
+      ]},
+      output:{id:'output-list',classes:'output-channel-row',columns:[
+        ['Via / saída','bus',data.bus||''],
+        ['Destino / músico','destination',data.destination||''],
+        ['Tipo de retorno','kind',data.kind||'Monitor de chão',fieldOptions.kind],
+        ['Conexão','connection',data.connection||''],
+        ['Observações','notes',data.notes||'']
+      ]},
+      checklist:{id:'technical-checklist',classes:'checklist-row',columns:[
+        ['Concluído','done',data.done===true,null,'checkbox'],
+        ['Etapa','group',data.group||'Pré-produção',fieldOptions.group],
+        ['Tarefa / verificação','label',data.label||'']
+      ]}
+    }[kind];
+    if(!spec)return;
+    if($(spec.id).querySelectorAll('.builder-row').length>=limits[kind]){notify('Limite de itens atingido nesta lista.',true);return;}
+    const line=document.createElement('div');line.className='builder-row '+spec.classes;
+    for(const [label,key,value,options,mode] of spec.columns){
+      const field=createBuilderField(label,key,value,options||null,mode||'text',key==='notes'?250:100);
+      line.append(field);
+    }
+    const remove=document.createElement('button');remove.type='button';remove.className='builder-remove';
+    remove.textContent='×';remove.setAttribute('aria-label','Remover item');
+    remove.title='Remover item';
+    remove.addEventListener('click',()=>{line.remove();updateBuilderCounts();});
+    line.append(remove);
+    line.addEventListener('input',updateBuilderCounts);
+    line.addEventListener('change',updateBuilderCounts);
+    $(spec.id).append(line);updateBuilderCounts();
+  }
+  function loadBuilders(data){
+    for(const id of ['input-list','output-list','technical-checklist'])$(id).replaceChildren();
+    (Array.isArray(data.inputList)?data.inputList:[]).slice(0,limits.input).forEach(row=>appendBuilder('input',row));
+    (Array.isArray(data.outputList)?data.outputList:[]).slice(0,limits.output).forEach(row=>appendBuilder('output',row));
+    (Array.isArray(data.technicalChecklist)?data.technicalChecklist:presetChecklist)
+      .slice(0,limits.checklist).forEach(row=>appendBuilder('checklist',row));
+    updateBuilderCounts();
+  }
+  function generateInputsFromInstruments(){
+    if(readBuilder('input-list').length){
+      notify('Para evitar duplicidades, gere a sugestão antes de adicionar canais manualmente.',true);return;
+    }
+    const all=readInstruments();
+    if(!all.length){notify('Inclua instrumentos na formação antes de gerar o patch.',true);return;}
+    const channels=[];
+    const add=(source,microphone='A definir',category='Instrumento')=>{
+      if(channels.length<limits.input)channels.push({channel:String(channels.length+1).padStart(2,'0'),category,source,microphone,stand:'A definir',phantom:false,notes:''});
+    };
+    for(const instrument of all){
+      const name=String(instrument.name||'').trim();
+      const quantity=Math.min(Number(instrument.qty)||1,16);
+      for(let i=1;i<=quantity;i++){
+        const label=quantity>1?name+' '+i:name;
+        const normalized=name.toLocaleLowerCase('pt-BR');
+        if(/bateria/.test(normalized)){
+          for(const [part,mic] of [['Bumbo','Dinâmico'],['Caixa','Dinâmico'],['Tom','Dinâmico'],['Over L','Condensador'],['Over R','Condensador']])add(label+' · '+part,mic);
+        }else if(/teclado|piano|sintetizador/.test(normalized)){
+          add(label+' · L','DI');add(label+' · R','DI');
+        }else if(/violão|baixo|contrabaixo/.test(normalized)){add(label,'DI');}
+        else add(label);
+      }
+    }
+    channels.forEach(row=>appendBuilder('input',row));
+    if(channels.length===limits.input)notify('Lista limitada a 96 canais. Revise o patch manualmente.',true);
+    else notify('Sugestão de Input List criada. Revise os microfones e numeração.');
+  }
   function defaultData(module=activeModule) {
     const result={}; new FormData(form).forEach((value,key)=>{if(typeof value==='string')result[key]=value;});
     result.eventName='';result.organizationName=signupOrganizationName;result.location='';result.eventDate='';result.eventType='Evento';result.year='2026';result.yearStart='2026';result.yearEnd='2027';
     result.instruments = module==='som' ? starterInstruments.map(x=>({...x})) : [];
+    result.inputList=[];result.outputList=[];
+    result.technicalChecklist=presetChecklist.map(x=>({...x}));
     result.artwork='';result.module=module;return result;
   }
   function capture() {
     const o={module:activeModule};new FormData(form).forEach((value,key)=>{if(typeof value==='string')o[key]=value;});
-    o.instruments=readInstruments();o.artwork=artworkData;return o;
+    o.instruments=readInstruments();
+    o.inputList=readBuilder('input-list');
+    o.outputList=readBuilder('output-list');
+    o.technicalChecklist=readBuilder('technical-checklist');
+    o.artwork=artworkData;return o;
   }
   function restore(data={}) {
     form.reset();
@@ -79,6 +220,7 @@
       if (element.name && Object.hasOwn(data,element.name) && ['INPUT','SELECT','TEXTAREA'].includes(element.tagName) && element.type !== 'file') element.value=toSafeString(data[element.name]);
     });
     loadInstruments(Array.isArray(data.instruments)?data.instruments:starterInstruments);
+    loadBuilders(data);
     artworkData=data.artwork||'';$('artwork').value='';updateArtwork();
     if(!$('event-type').value)$('event-type').value='Evento';
     updateVigil();updateSummary();
@@ -127,7 +269,7 @@
     $('breadcrumb-current').textContent=definitions[activeModule].crumb;
     $('page-title').textContent=definitions[activeModule].title;
     $('hero-subtitle').textContent=definitions[activeModule].hero;
-    $('last-section-number').textContent=activeModule==='som'?'05':'03';
+    $('last-section-number').textContent=activeModule==='som'?'08':'03';
     $('last-saved').textContent='Ainda não salvo';
     if(restoreWorking && workspaces[next])restore(workspaces[next]);else restore(defaultData(next));
     $('main-area').scrollTo({top:0,behavior:'smooth'});
@@ -180,6 +322,12 @@
   const printedPair=(label,value)=>`<div class="print-field"><small>${escapeHTML(label)}</small><strong>${escapeHTML(value||'Não informado')}</strong></div>`;
   const section=(number,title,contents)=>`<section class="print-section"><h3><span>${escapeHTML(number)}</span> ${escapeHTML(title)}</h3>${contents}</section>`;
   const printedNotes=(text)=>`<p class="print-notes">${escapeHTML(text||'Não informado')}</p>`;
+  const printTechnicalTable=(headers,rows)=>{
+    if(!rows.length)return '<p class="print-muted">Nenhum item informado.</p>';
+    const head=headers.map(h=>`<th>${escapeHTML(h)}</th>`).join('');
+    const body=rows.map(row=>'<tr>'+row.map(c=>`<td>${escapeHTML(c)}</td>`).join('')+'</tr>').join('');
+    return `<table class="print-technical-table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
+  };
   function generatePrintMarkup(d) {
     const description=definitions[activeModule];
     const year=d.eventType==='Vigília'?`${d.yearStart} → ${d.yearEnd}`:(d.eventDate?d.eventDate.slice(0,4):d.year);
@@ -189,12 +337,18 @@
       const instruments=(d.instruments||[]).map(i=>`<div class="print-item"><span>${escapeHTML(i.name)}</span><strong>${escapeHTML(i.qty)} un.</strong></div>`).join('')||'<p>Nenhum instrumento adicionado.</p>';
       html+=section('03','Formação da banda',`<div class="print-list">${instruments}</div><div class="print-pairs" style="margin-top:6mm">${printedPair('Cantores principais',d.leadSingers)}${printedPair('Backing vocals',d.backSingers)}</div>`);
       html+=section('04','Patch e monitoração',`<div class="print-pairs">${printedPair('Canais de entrada (estimativa)',d.inputCount)}${printedPair('Vias de monitoração',d.auxCount)}${printedPair('Tipo de monitoração',d.monitorType)}</div>${printedNotes(d.patchNotes)}`);
+      const inputRows=(d.inputList||[]).map(x=>[x.channel||'',x.source||'',x.microphone||'',x.stand||'',x.phantom?'Sim':'Não',x.notes||'']);
+      const outputRows=(d.outputList||[]).map(x=>[x.bus||'',x.destination||'',x.kind||'',x.connection||'',x.notes||'']);
+      const checklistRows=(d.technicalChecklist||[]).map(x=>[x.done?'Concluído':'Pendente',x.group||'',x.label||'']);
+      html+=section('05','Input List · Canais de entrada',printTechnicalTable(['CH','Fonte','Mic / DI','Pedestal','48V','Notas'],inputRows));
+      html+=section('06','Output List · Saídas',printTechnicalTable(['Via','Destino','Tipo','Conexão','Notas'],outputRows));
+      html+=section('07','Checklist técnico',printTechnicalTable(['Estado','Etapa','Verificação'],checklistRows));
     } else if(activeModule==='luz') {
       html+=section('02','Iluminação',`<div class="print-pairs">${printedPair('Controladora',d.lightConsole)}${printedPair('Quantidade de refletores',d.lightQty)}${printedPair('Tipo principal',d.lightType)}${printedPair('Controle de sinal',d.lightControl)}</div>${printedNotes(d.lightNotes)}`);
     } else {
       html+=section('02','Imagem e vídeo',`<div class="print-pairs">${printedPair('Quantidade de câmeras',d.cameraQty)}${printedPair('Resolução',d.videoOutput)}${printedPair('Mesa / switcher',d.videoSwitcher)}${printedPair('Saída principal',d.streamTarget)}</div>${printedNotes(d.videoNotes)}`);
     }
-    html+=section(activeModule==='som'?'05':'03','Responsáveis e observações',`<div class="print-pairs">${printedPair('Responsável técnico',d.contactName)}${printedPair('Função',d.contactRole)}${printedPair('E-mail',d.contactEmail)}${printedPair('Telefone',d.contactPhone)}</div>${printedNotes(d.generalNotes)}`);
+    html+=section(activeModule==='som'?'08':'03','Responsáveis e observações',`<div class="print-pairs">${printedPair('Responsável técnico',d.contactName)}${printedPair('Função',d.contactRole)}${printedPair('E-mail',d.contactEmail)}${printedPair('Telefone',d.contactPhone)}</div>${printedNotes(d.generalNotes)}`);
     const documentTitle=escapeHTML(d.eventName);
     const printRoot=$('print-root');
     printRoot.innerHTML=`<div class="print-cover"><div><div class="print-over">${escapeHTML((d.organizationName||"").trim()||"IDENTIFICAÇÃO DO EVENTO")}</div><h1>RIDER TÉCNICO</h1><h2>${escapeHTML(description.hero)}</h2><div class="print-line"></div><strong class="print-event-name">${escapeHTML(eventDisplayName(d))}</strong><small>${escapeHTML(eventPeriod(d))}</small></div></div><div class="print-body">${html}<div class="print-bottom"><span>${escapeHTML(description.print)}</span><span>${documentTitle} · ${escapeHTML(eventPeriod(d))}</span></div></div>`;
@@ -364,6 +518,13 @@
     for(const b of document.querySelectorAll('.nav-item'))b.addEventListener('click',()=>setModule(b.dataset.module));
     for(const id of ['new-rider','new-draft-side'])$(id).addEventListener('click',makeNew);
     $('add-instrument').addEventListener('click',()=>{appendInstrument();updateSummary();});
+    $('add-input-channel').addEventListener('click',()=>{
+      const count=readBuilder('input-list').length;
+      appendBuilder('input',{channel:String(count+1).padStart(2,'0')});
+    });
+    $('generate-inputs').addEventListener('click',generateInputsFromInstruments);
+    $('add-output-channel').addEventListener('click',()=>appendBuilder('output'));
+    $('add-checklist-item').addEventListener('click',()=>appendBuilder('checklist'));
     $('save-btn').addEventListener('click',saveRider);
     $('cancel-btn').addEventListener('click',()=>{
       if(!confirm('Cancelar edição e descartar alterações não salvas?'))return;

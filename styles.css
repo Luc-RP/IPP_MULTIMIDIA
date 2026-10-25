@@ -78,3 +78,36 @@ body[data-auth-loading="true"] #auth-page,body[data-auth-loading="true"] #app-pa
  .print-bottom{gap:6mm}
  .print-bottom span:last-child{text-align:right;overflow-wrap:anywhere}
 }
+
+
+/* Estrutura do patch e checklist técnico: componentes acessíveis, preservando o visual LK. */
+.technical-builder{margin-top:22px;padding:22px 0 0;border-top:1px solid #dbe5e6}
+.builder-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px}
+.builder-eyebrow{display:block;color:#237974;font-weight:800;font-size:9px;letter-spacing:.12em;margin-bottom:6px}
+.builder-heading h3{font-size:17px;font-weight:800;color:#172e36;margin:0 0 5px}
+.builder-heading p{font-size:11px;line-height:1.55;color:#657d82;margin:0}
+.builder-counter{font-size:10px;font-weight:800;white-space:nowrap;background:#e7f4f1;color:#236e6a;border-radius:6px;padding:8px 10px}
+.structured-list{display:grid;gap:9px}
+.builder-row{position:relative;display:grid;gap:8px;align-items:end;padding:12px;border:1px solid #dbe5e6;border-radius:7px;background:#f5fafa}
+.input-channel-row{grid-template-columns:55px minmax(92px,1fr) minmax(110px,1.25fr) minmax(94px,1fr) minmax(82px,.95fr) 68px minmax(112px,1.3fr) 28px}
+.output-channel-row{grid-template-columns:minmax(64px,.65fr) minmax(125px,1.3fr) minmax(125px,1.15fr) minmax(90px,1fr) minmax(120px,1.2fr) 28px}
+.checklist-row{grid-template-columns:75px minmax(110px,.85fr) minmax(200px,3fr) 28px}
+.builder-field{display:grid;min-width:0;gap:6px}
+.builder-field span{font-size:10px;font-weight:700;color:#586d74}
+.builder-field input:not([type=checkbox]),.builder-field select{width:100%;min-width:0;height:37px;padding:7px 8px;border-radius:5px;background:#fff;border:1px solid #cbdadf;color:#182e38;font-size:11px}
+.builder-field input:focus,.builder-field select:focus{border-color:#32978e;outline:2px solid #c0e7e2}
+.builder-field input[type=checkbox]{width:19px;height:19px;accent-color:#268e85;justify-self:start;margin:9px 0}
+.builder-remove{width:28px;height:37px;border:0;border-radius:5px;color:#a13d45;background:transparent;font-size:20px}
+.builder-remove:hover{background:#fce4e6}
+.builder-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}
+.builder-actions .add-btn{margin:0}
+.builder-actions .add-btn.secondary{border-color:#bacfd0;background:transparent;color:#325a60}
+.builder-actions .add-btn.secondary:hover{background:#e7f3f1}
+.print-technical-table{width:100%;border-collapse:collapse;font-size:10px;table-layout:auto}
+.print-technical-table th{background:#e1eff0;color:#16434b;border:1px solid #bdd0d3;text-align:left;padding:6px}
+.print-technical-table td{border:1px solid #d6e2e3;padding:6px;vertical-align:top;overflow-wrap:anywhere}
+.print-muted{font-size:11px;color:#6c7d81}
+@media(max-width:1250px){.input-channel-row{grid-template-columns:repeat(3,minmax(0,1fr)) 28px}.output-channel-row{grid-template-columns:repeat(3,minmax(0,1fr)) 28px}.checklist-row{grid-template-columns:75px minmax(95px,1fr) minmax(0,2fr) 28px}}
+@media(max-width:700px){.technical-builder{margin-top:18px}.builder-heading{flex-wrap:wrap}.input-channel-row,.output-channel-row{grid-template-columns:repeat(2,minmax(0,1fr)) 28px}.checklist-row{grid-template-columns:75px minmax(0,1fr) 28px}.checklist-row .builder-field:last-of-type{grid-column:1/-2}.builder-field{min-width:0}.builder-actions{display:grid}.builder-actions button{width:100%}}
+@media(max-width:400px){.input-channel-row,.output-channel-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 27px}}
+@media print{.technical-builder{display:none!important}.print-technical-table{break-inside:auto}.print-technical-table thead{display:table-header-group}.print-technical-table tr{break-inside:avoid}}
