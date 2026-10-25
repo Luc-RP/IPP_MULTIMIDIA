@@ -150,7 +150,7 @@
   async function saveRider(){
     if(!validate())return;
     if(artworkData){notify('Remova a imagem anexada para salvar o rider.',true);return;}
-    const d=capture(),payload={category:activeModule,title:d.eventName||'Rider técnico',eventYear:d.eventType==='Vigília'?d.yearStart:d.eventYear,content:{...d,artwork:''}};
+    const d=capture(),payload={category:activeModule,title:d.eventName||'Rider técnico',eventYear:d.eventType==='Vigília'?d.yearStart:(d.eventDate?d.eventDate.slice(0,4):d.year),content:{...d,artwork:''}};
     const btn=$('save-btn');btn.disabled=true;
     try{
       const resp=await api(activeDraftId?'/api/riders/'+encodeURIComponent(activeDraftId):'/api/riders',activeDraftId?'PUT':'POST',payload);
@@ -182,7 +182,7 @@
   const printedNotes=(text)=>`<p class="print-notes">${escapeHTML(text||'Não informado')}</p>`;
   function generatePrintMarkup(d) {
     const description=definitions[activeModule];
-    const year=d.eventType==='Vigília'?`${d.yearStart} → ${d.yearEnd}`:d.year;
+    const year=d.eventType==='Vigília'?`${d.yearStart} → ${d.yearEnd}`:(d.eventDate?d.eventDate.slice(0,4):d.year);
     let html=section('01','Identificação do evento',`<div class="print-pairs">${d.organizationName?.trim()?printedPair('Organização',d.organizationName):''}${printedPair('Tipo de evento',d.eventType==='Outro'?eventDisplayName(d):d.eventType)}${printedPair('Ano / período',year)}${printedPair('Nome do evento',d.eventName)}${printedPair('Data',d.eventDate?new Date(`${d.eventDate}T12:00:00`).toLocaleDateString('pt-BR'):'Não informada')}${printedPair('Local',d.location)}</div>${d.artwork?`<div class="print-field" style="margin-top:5mm"><small>Arte de identidade visual</small><img class="print-art" src="${d.artwork}" alt="Arte do evento" /></div>`:''}`);
     if(activeModule==='som') {
       html+=section('02','Sistema principal · P.A.',`<div class="print-pairs">${printedPair('Mesa de som',d.console)}${printedPair('Modelo adicional',d.consoleOther)}${printedPair('Caixas principais',d.speakerModel)}${printedPair('Tipo de sistema',d.speakerType)}${printedPair('Quantidade de caixas',d.speakerQty)}${printedPair('Subwoofers',d.subQty)}${printedPair('Monitores de chão',d.monitorQty)}</div>${d.paNotes?printedNotes(d.paNotes):''}`);
