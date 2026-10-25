@@ -5,7 +5,7 @@
   const selectors = id => document.getElementById(id);
   const form = selectors('rider-form');
   const definitions = {
-    som: {title:'Rider técnico de som', crumb:'SOM', hero:'SONORIZAÇÃO / BANDA / PRODUÇÃO', print:'RIDER DE SOM'},
+    som: {title:'Rider técnico de som', crumb:'SOM', hero:'SONORIZAÇÃO / PRODUÇÃO TÉCNICA', print:'RIDER DE SOM'},
     luz: {title:'Rider técnico de luz', crumb:'LUZ', hero:'ILUMINAÇÃO / EQUIPE TÉCNICA', print:'RIDER DE LUZ'},
     imagem: {title:'Rider técnico de imagem', crumb:'IMAGEM', hero:'IMAGEM & VÍDEO / EQUIPE TÉCNICA', print:'RIDER DE IMAGEM'}
   };
@@ -65,7 +65,7 @@
   }
   function defaultData(module=activeModule) {
     const result={}; new FormData(form).forEach((value,key)=>{if(typeof value==='string')result[key]=value;});
-    result.eventName='';result.location='';result.eventDate='';result.eventType='Evento de jovens';result.year='2026';result.yearStart='2026';result.yearEnd='2027';
+    result.eventName='';result.organizationName='';result.location='';result.eventDate='';result.eventType='Evento';result.year='2026';result.yearStart='2026';result.yearEnd='2027';
     result.instruments = module==='som' ? starterInstruments.map(x=>({...x})) : [];
     result.artwork='';result.module=module;return result;
   }
@@ -80,6 +80,7 @@
     });
     loadInstruments(Array.isArray(data.instruments)?data.instruments:starterInstruments);
     artworkData=data.artwork||'';$('artwork').value='';updateArtwork();
+    if(!$('event-type').value)$('event-type').value='Evento';
     updateVigil();updateSummary();
   }
   function updateArtwork(){
@@ -89,10 +90,28 @@
   function updateVigil() {
     const vigil=$('event-type').value==='Vigília';$('vigil-years').hidden=!vigil;
     $('event-year').disabled=vigil;
-    $('hero-year').textContent=vigil ? `${$('year-start').value}  →  ${$('year-end').value}` : `EVENTO DE ${$('event-year').value}`;
+    updateEventHeader();
     updateSummary();
   }
+  function eventPeriod(d){
+    if(d.eventDate && /^\d{4}-\d{2}-\d{2}$/.test(d.eventDate)){
+      const value=new Date(d.eventDate+'T12:00:00');
+      if(!Number.isNaN(value.getTime()))return new Intl.DateTimeFormat('pt-BR',{month:'long',year:'numeric'}).format(value);
+    }
+    return d.eventType==='Vigília'?d.yearStart+' → '+d.yearEnd:(d.year||'');
+  }
+  function eventDisplayName(d){
+    return String(d.eventName||'').trim()||((d.eventType&&d.eventType!=='Outro')?d.eventType:'Evento');
+  }
+  function updateEventHeader(){
+    const d={eventType:$('event-type').value,eventName:$('event-name').value,eventDate:$('event-date').value,
+      year:$('event-year').value,yearStart:$('year-start').value,yearEnd:$('year-end').value};
+    $('hero-organization').textContent=$('organization-name').value.trim()||'IDENTIFICAÇÃO DO EVENTO';
+    $('hero-event-name').textContent=eventDisplayName(d);
+    $('hero-year').textContent=eventPeriod(d);
+  }
   function updateSummary() {
+    updateEventHeader();
     $('context-type').textContent=definitions[activeModule].crumb;
     $('context-event').textContent=$('event-name').value.trim().slice(0,45)||'Não informado';
     const count=readInstruments().length;
@@ -122,7 +141,7 @@
       $('speaker-model').value=''; notify('Plano Free: escolha uma caixa do catálogo. Modelo personalizado estará no Premium.',true); return false;
     }
     const name=$('event-name').value.trim();
-    if(!name){$('event-name').focus();notify('Informe o nome do evento ou campanha antes de salvar ou exportar.',true);return false;}
+    if(!name){$('event-name').focus();notify('Informe o nome do evento antes de salvar ou exportar.',true);return false;}
     if($('event-type').value==='Vigília' && Number($('year-end').value)<=Number($('year-start').value)){
       $('year-end').focus();notify('O ano final precisa ser maior que o ano inicial.',true);return false;
     }
@@ -164,7 +183,7 @@
   function generatePrintMarkup(d) {
     const description=definitions[activeModule];
     const year=d.eventType==='Vigília'?`${d.yearStart} → ${d.yearEnd}`:d.year;
-    let html=section('01','Identificação do evento',`<div class="print-pairs">${printedPair('Tipo de evento',d.eventType)}${printedPair('Ano / período',year)}${printedPair('Nome do evento',d.eventName)}${printedPair('Data',d.eventDate?new Date(`${d.eventDate}T12:00:00`).toLocaleDateString('pt-BR'):'Não informada')}${printedPair('Local',d.location)}</div>${d.artwork?`<div class="print-field" style="margin-top:5mm"><small>Arte de identidade visual</small><img class="print-art" src="${d.artwork}" alt="Arte do evento" /></div>`:''}`);
+    let html=section('01','Identificação do evento',`<div class="print-pairs">${printedPair('Organização',d.organizationName)}${printedPair('Tipo de evento',d.eventType==='Outro'?eventDisplayName(d):d.eventType)}${printedPair('Ano / período',year)}${printedPair('Nome do evento',d.eventName)}${printedPair('Data',d.eventDate?new Date(`${d.eventDate}T12:00:00`).toLocaleDateString('pt-BR'):'Não informada')}${printedPair('Local',d.location)}</div>${d.artwork?`<div class="print-field" style="margin-top:5mm"><small>Arte de identidade visual</small><img class="print-art" src="${d.artwork}" alt="Arte do evento" /></div>`:''}`);
     if(activeModule==='som') {
       html+=section('02','Sistema principal · P.A.',`<div class="print-pairs">${printedPair('Mesa de som',d.console)}${printedPair('Modelo adicional',d.consoleOther)}${printedPair('Caixas principais',d.speakerModel)}${printedPair('Tipo de sistema',d.speakerType)}${printedPair('Quantidade de caixas',d.speakerQty)}${printedPair('Subwoofers',d.subQty)}${printedPair('Monitores de chão',d.monitorQty)}</div>${d.paNotes?printedNotes(d.paNotes):''}`);
       const instruments=(d.instruments||[]).map(i=>`<div class="print-item"><span>${escapeHTML(i.name)}</span><strong>${escapeHTML(i.qty)} un.</strong></div>`).join('')||'<p>Nenhum instrumento adicionado.</p>';
@@ -178,7 +197,7 @@
     html+=section(activeModule==='som'?'05':'03','Responsáveis e observações',`<div class="print-pairs">${printedPair('Responsável técnico',d.contactName)}${printedPair('Função',d.contactRole)}${printedPair('E-mail',d.contactEmail)}${printedPair('Telefone',d.contactPhone)}</div>${printedNotes(d.generalNotes)}`);
     const documentTitle=escapeHTML(d.eventName);
     const printRoot=$('print-root');
-    printRoot.innerHTML=`<div class="print-cover"><div><div class="print-over">LK MULTIMÍDIA · PRODUÇÃO & COMUNICAÇÃO</div><h1>RIDER TÉCNICO</h1><h2>${escapeHTML(description.hero)}</h2><div class="print-line"></div><small>${documentTitle} · ${escapeHTML(year)}</small></div><div class="print-logo">LK</div></div><div class="print-body">${html}<div class="print-bottom"><span>LK MULTIMÍDIA · ${escapeHTML(description.print)}</span><span>DOCUMENTO GERADO EM ${escapeHTML(new Date().toLocaleDateString('pt-BR'))}</span></div></div>`;
+    printRoot.innerHTML=`<div class="print-cover"><div><div class="print-over">${escapeHTML((d.organizationName||"").trim()||"IDENTIFICAÇÃO DO EVENTO")}</div><h1>RIDER TÉCNICO</h1><h2>${escapeHTML(description.hero)}</h2><div class="print-line"></div><strong class="print-event-name">${escapeHTML(eventDisplayName(d))}</strong><small>${escapeHTML(eventPeriod(d))}</small></div></div><div class="print-body">${html}<div class="print-bottom"><span>${escapeHTML(description.print)}</span><span>${documentTitle} · ${escapeHTML(eventPeriod(d))}</span></div></div>`;
   }
   function printRider() {
     if(!validate())return;
