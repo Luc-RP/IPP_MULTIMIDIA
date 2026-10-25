@@ -324,7 +324,7 @@
     }catch(e){notify(e.message,true);}
   }
   const printedPair=(label,value)=>`<div class="print-field"><small>${escapeHTML(label)}</small><strong>${escapeHTML(value||'Não informado')}</strong></div>`;
-  const section=(number,title,contents)=>`<section class="print-section"><h3><span>${escapeHTML(number)}</span> ${escapeHTML(title)}</h3>${contents}</section>`;
+  const section=(number,title,contents,{table=false}={})=>`<section class="print-section${table?' print-section--table':''}"><h3><span>${escapeHTML(number)}</span> ${escapeHTML(title)}</h3>${contents}</section>`;
   const printedNotes=(text)=>`<p class="print-notes">${escapeHTML(text||'Não informado')}</p>`;
   const printTechnicalTable=(headers,rows)=>{
     if(!rows.length)return '<p class="print-muted">Nenhum item informado.</p>';
@@ -335,18 +335,27 @@
   function generatePrintMarkup(d) {
     const description=definitions[activeModule];
     const year=d.eventType==='Vigília'?`${d.yearStart} → ${d.yearEnd}`:(d.eventDate?d.eventDate.slice(0,4):d.year);
-    let html=section('01','Identificação do evento',`<div class="print-pairs">${d.organizationName?.trim()?printedPair('Organização',d.organizationName):''}${printedPair('Tipo de evento',d.eventType==='Outro'?eventDisplayName(d):d.eventType)}${printedPair('Ano / período',year)}${printedPair('Nome do evento',d.eventName)}${printedPair('Data',d.eventDate?new Date(`${d.eventDate}T12:00:00`).toLocaleDateString('pt-BR'):'Não informada')}${printedPair('Local',d.location)}</div>${d.artwork?`<div class="print-field" style="margin-top:5mm"><small>Arte de identidade visual</small><img class="print-art" src="${d.artwork}" alt="Arte do evento" /></div>`:''}`);
+    const productionFields=[
+      ['Porte do evento',d.eventScale],['Público estimado',d.expectedAudience],
+      ['Dimensões do palco',d.stageDimensions],['Backline fornecido por',d.backlineProvider],
+      ['Montagem / load-in',d.loadInTime],['Passagem de som',d.soundcheckTime],
+      ['Energia e infraestrutura',d.powerRequirements]
+    ].filter(([,value])=>String(value??'').trim());
+    const productionExtra=productionFields.length
+      ?`<div class="print-subgroup"><h4>Planejamento técnico</h4><div class="print-pairs">${productionFields.map(([label,value])=>printedPair(label,value)).join('')}</div></div>`
+      :'';
+    let html=section('01','Identificação do evento',`<div class="print-pairs">${d.organizationName?.trim()?printedPair('Organização',d.organizationName):''}${printedPair('Tipo de evento',d.eventType==='Outro'?eventDisplayName(d):d.eventType)}${printedPair('Ano / período',year)}${printedPair('Nome do evento',d.eventName)}${printedPair('Data',d.eventDate?new Date(`${d.eventDate}T12:00:00`).toLocaleDateString('pt-BR'):'Não informada')}${printedPair('Local',d.location)}</div>${productionExtra}${d.artwork?`<div class="print-field" style="margin-top:5mm"><small>Arte de identidade visual</small><img class="print-art" src="${d.artwork}" alt="Arte do evento" /></div>`:''}`);
     if(activeModule==='som') {
       html+=section('02','Sistema principal · P.A.',`<div class="print-pairs">${printedPair('Mesa de som',d.console)}${printedPair('Modelo adicional',d.consoleOther)}${printedPair('Caixas principais',d.speakerModel)}${printedPair('Tipo de sistema',d.speakerType)}${printedPair('Quantidade de caixas',d.speakerQty)}${printedPair('Subwoofers',d.subQty)}${printedPair('Monitores de chão',d.monitorQty)}</div>${d.paNotes?printedNotes(d.paNotes):''}`);
       const instruments=(d.instruments||[]).map(i=>`<div class="print-item"><span>${escapeHTML(i.name)}</span><strong>${escapeHTML(i.qty)} un.</strong></div>`).join('')||'<p>Nenhum instrumento adicionado.</p>';
-      html+=section('03','Formação da banda',`<div class="print-list">${instruments}</div><div class="print-pairs" style="margin-top:6mm">${printedPair('Cantores principais',d.leadSingers)}${printedPair('Backing vocals',d.backSingers)}</div>`);
+      html+=section('03','Formação da banda',`<div class="print-list">${instruments}</div><div class="print-pairs print-vocals">${printedPair('Cantores principais',d.leadSingers)}${printedPair('Backing vocals',d.backSingers)}</div>`);
       html+=section('04','Patch e monitoração',`<div class="print-pairs">${printedPair('Canais de entrada (estimativa)',d.inputCount)}${printedPair('Vias de monitoração',d.auxCount)}${printedPair('Tipo de monitoração',d.monitorType)}</div>${printedNotes(d.patchNotes)}`);
       const inputRows=(Array.isArray(d.inputList)?d.inputList:[]).map(item=>{const x=item||{};return [x.channel||'',x.source||'',x.microphone||'',x.stand||'',x.phantom?'Sim':'Não',x.notes||''];});
       const outputRows=(Array.isArray(d.outputList)?d.outputList:[]).map(item=>{const x=item||{};return [x.bus||'',x.destination||'',x.kind||'',x.connection||'',x.notes||''];});
       const checklistRows=(Array.isArray(d.technicalChecklist)?d.technicalChecklist:[]).map(item=>{const x=item||{};return [x.done?'Concluído':'Pendente',x.group||'',x.label||''];});
-      html+=section('05','Input List · Canais de entrada',printTechnicalTable(['CH','Fonte','Mic / DI','Pedestal','48V','Notas'],inputRows));
-      html+=section('06','Output List · Saídas',printTechnicalTable(['Via','Destino','Tipo','Conexão','Notas'],outputRows));
-      html+=section('07','Checklist técnico',printTechnicalTable(['Estado','Etapa','Verificação'],checklistRows));
+      html+=section('05','Input List · Canais de entrada',printTechnicalTable(['CH','Fonte','Mic / DI','Pedestal','48V','Notas'],inputRows),{table:true});
+      html+=section('06','Output List · Saídas',printTechnicalTable(['Via','Destino','Tipo','Conexão','Notas'],outputRows),{table:true});
+      html+=section('07','Checklist técnico',printTechnicalTable(['Estado','Etapa','Verificação'],checklistRows),{table:true});
     } else if(activeModule==='luz') {
       html+=section('02','Iluminação',`<div class="print-pairs">${printedPair('Controladora',d.lightConsole)}${printedPair('Quantidade de refletores',d.lightQty)}${printedPair('Tipo principal',d.lightType)}${printedPair('Controle de sinal',d.lightControl)}</div>${printedNotes(d.lightNotes)}`);
     } else {
