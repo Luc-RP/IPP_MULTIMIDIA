@@ -194,6 +194,7 @@
     });
     $('remove-artwork').addEventListener('click',()=>{artworkData='';$('artwork').value='';updateArtwork();});
   }
+  function finishSessionBoot(){document.body.dataset.authLoading='false';$('session-loading').hidden=true;}
   function setupAccountForms(){
     const parts=['login-title','login-description','login-form','show-register'];
     function showRegister(enabled){
@@ -266,17 +267,16 @@
         if(!response.ok)throw Error('API indisponível');
         return response.json();
       })
-      .then(health=>{
-        if(health.authEnabled!==true){
-          API_READY=false;
-          return;
-        }
+      .then(async health=>{
+        if(health.authEnabled!==true){API_READY=false;return;}
         API_READY=true;
         $('login-form').querySelector('[type=submit]').disabled=false;
         $('register-form').querySelector('[type=submit]').disabled=health.smtpReady!==true;
-        api('/api/me').then(()=>showApp()).catch(()=>{});
+        try{await api('/api/me');showApp();}
+        catch{/* Sessão ausente ou expirada: apresentar login normalmente. */}
       })
-      .catch(()=>{API_READY=false;});
+      .catch(()=>{API_READY=false;})
+      .finally(finishSessionBoot);
   }
   function showApp() {$('auth-page').hidden=true;$('app-page').hidden=false;refreshRiders().catch(e=>notify(e.message,true));updateSummary();}
   function setupListeners() {

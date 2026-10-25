@@ -12,3 +12,8 @@ button:disabled,input:disabled{opacity:.55;cursor:not-allowed}
 .auth-card form label.register-password-visibility{display:flex;align-items:center;gap:10px;margin:12px 0 15px;color:#394d56;cursor:pointer;font-size:12px;font-weight:600;line-height:1.5;user-select:none}
 .register-password-visibility input{width:16px;height:16px;flex:0 0 16px;margin:0;accent-color:var(--cyan-dark);cursor:pointer}
 .register-password-visibility span{display:inline-block}
+
+/* LK: restaurar a sessão antes de mostrar login ou painel, inclusive no F5. */
+.session-loading{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;gap:13px;flex-direction:column;background:radial-gradient(circle at 17% 17%,#173d44,#0b1015 60%,#11151a);color:#f9fbfb;letter-spacing:.16em;font-size:12px;font-weight:800}
+.session-loading img{filter:drop-shadow(0 5px 22px rgba(68,197,188,.15))}
+body[data-auth-loading="true"] #auth-page,body[data-auth-loading="true"] #app-page{visibility:hidden!important}
