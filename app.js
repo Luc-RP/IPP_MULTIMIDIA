@@ -202,7 +202,16 @@
       $('register-form-step').hidden=false;$('register-verification-step').hidden=true;
       $('register-error').textContent='';$('verify-error').textContent='';
       if(enabled)$('account-status').hidden=true;
+      registrationVisibility.checked=false;
+      $('register-password').type='password';
+      $('register-password-confirm').type='password';
     }
+    const registrationVisibility=$('register-show-password');
+    registrationVisibility.addEventListener('change',()=>{
+      const visible=registrationVisibility.checked;
+      $('register-password').type=visible?'text':'password';
+      $('register-password-confirm').type=visible?'text':'password';
+    });
     $('show-register').addEventListener('click',()=>showRegister(true));
     $('register-back-login').addEventListener('click',()=>showRegister(false));
     $('verification-back').addEventListener('click',()=>{$('register-form-step').hidden=false;$('register-verification-step').hidden=true;});
