@@ -111,3 +111,11 @@ body[data-auth-loading="true"] #auth-page,body[data-auth-loading="true"] #app-pa
 @media(max-width:700px){.technical-builder{margin-top:18px}.builder-heading{flex-wrap:wrap}.input-channel-row,.output-channel-row{grid-template-columns:repeat(2,minmax(0,1fr)) 28px}.checklist-row{grid-template-columns:75px minmax(0,1fr) 28px}.checklist-row .builder-field:last-of-type{grid-column:1/-2}.builder-field{min-width:0}.builder-actions{display:grid}.builder-actions button{width:100%}}
 @media(max-width:400px){.input-channel-row,.output-channel-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 27px}}
 @media print{.technical-builder{display:none!important}.print-technical-table{break-inside:auto}.print-technical-table thead{display:table-header-group}.print-technical-table tr{break-inside:avoid}}
+
+/* Campos avançados ficam fechados por padrão, sem aumentar o formulário simples. */
+.production-details{border:1px solid #d0e4e1;background:#f4faf9;border-radius:7px;padding:13px 14px;margin:16px 0 9px}
+.production-details summary{font-size:12px;font-weight:800;color:#22535a;cursor:pointer}
+.production-details p{font-size:11px;color:#6b848a;line-height:1.55;margin:9px 0 13px}
+.production-details .fields-grid{margin-bottom:13px}
+@media(max-width:560px){.production-details .fields-grid.two{grid-template-columns:minmax(0,1fr)}}
+@media print{.production-details{display:none!important}}

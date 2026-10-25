@@ -529,3 +529,44 @@ button, a, input, select, textarea {transition:background-color .16s ease,border
   .app-page .paper-actions button{min-width:0;white-space:normal;line-height:1.3}
   .app-page .paper-actions button:last-child{grid-column:1/-1}
 }
+
+/* Exportação A4 LK v0.8.1: paginação estável em todas as folhas. */
+@media print {
+  @page { size:A4 portrait; margin:11mm 13mm 13mm; }
+  html,body{margin:0!important;padding:0!important;width:auto!important;height:auto!important;overflow:visible!important;}
+  #print-root{width:auto!important;max-width:none!important;margin:0!important;padding:0!important;background:#fff!important;}
+  #print-root,#print-root *{font-family:Arial,Helvetica,sans-serif!important;}
+  .print-cover{display:block!important;min-height:0!important;height:auto!important;padding:9mm 11mm 8mm!important;margin:0 0 6mm!important;background:#152a30!important;color:#fff!important;break-inside:avoid-page;page-break-inside:avoid;}
+  .print-cover .print-over{font-size:8pt;line-height:1.15;margin:0!important;}
+  .print-cover h1{font-size:28pt!important;line-height:1.03;margin:3mm 0 1.4mm!important;letter-spacing:-.035em!important;}
+  .print-cover h2{font-size:12pt!important;line-height:1.1;margin:0!important;}
+  .print-cover .print-line{margin:3mm 0 2mm!important;height:1.5px;}
+  .print-cover .print-event-name{margin:0 0 1mm!important;line-height:1.15;font-size:14pt!important;}
+  .print-cover small{font-size:8pt;line-height:1.2;}
+  .print-body{padding:0 1mm!important;}
+  .print-section{margin:0 0 5.5mm!important;break-inside:avoid-page;page-break-inside:avoid;}
+  .print-section h3{font-size:12pt!important;line-height:1.28;padding:0 0 2mm!important;margin:0 0 3mm!important;break-after:avoid-page;page-break-after:avoid;}
+  .print-section h3 span{padding:1.3mm 2.1mm!important;margin-right:2.5mm!important;}
+  .print-pairs{grid-template-columns:repeat(2,minmax(0,1fr));gap:2.2mm 6mm!important;}
+  .print-field{min-width:0;break-inside:avoid-page;page-break-inside:avoid;}
+  .print-field small{line-height:1.16;margin-bottom:.65mm!important;}
+  .print-field strong{line-height:1.25;overflow-wrap:anywhere;white-space:pre-wrap;}
+  .print-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:1mm 6mm!important;}
+  .print-item{padding:1.2mm 0!important;min-width:0;gap:2mm;break-inside:avoid-page;page-break-inside:avoid;}
+  .print-item span{overflow-wrap:anywhere;min-width:0;}
+  .print-item strong{flex:none;}
+  .print-section .print-vocals{margin-top:2.6mm!important;}
+  .print-notes{margin:2mm 0 0!important;line-height:1.35!important;white-space:pre-wrap;overflow-wrap:anywhere;orphans:2;widows:2;}
+  .print-subgroup{margin:3.5mm 0 0;padding-top:2.5mm;border-top:1px solid #d6e5e6;break-inside:avoid-page;}
+  .print-subgroup h4{font-size:8pt;color:#22535a;text-transform:uppercase;margin:0 0 2mm;}
+  .print-section--table{break-inside:auto!important;page-break-inside:auto!important;}
+  .print-section--table h3{break-after:avoid-page;page-break-after:avoid;}
+  .print-technical-table{width:100%;max-width:100%;table-layout:fixed;border-collapse:collapse;font-size:8pt;}
+  .print-technical-table thead{display:table-header-group;}
+  .print-technical-table tbody{display:table-row-group;}
+  .print-technical-table tr{break-inside:avoid-page!important;page-break-inside:avoid!important;}
+  .print-technical-table th,.print-technical-table td{white-space:normal;overflow-wrap:anywhere;word-break:normal;padding:1.7mm 1.4mm;vertical-align:top;line-height:1.22;}
+  .print-bottom{margin:5mm 0 0!important;padding:2.5mm 0 0!important;gap:4mm;break-inside:avoid-page;page-break-inside:avoid;}
+  .print-bottom span{min-width:0;max-width:49%;overflow-wrap:anywhere;}
+  .print-art{max-width:85mm;max-height:40mm;break-inside:avoid-page;}
+}
