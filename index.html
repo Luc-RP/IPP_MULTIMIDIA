@@ -42,7 +42,12 @@
             <h2 id="register-title">Criar uma conta</h2>
             <p class="muted">Preencha seus dados e confirme seu e-mail para ativar o plano Free.</p>
             <form id="register-form" autocomplete="off">
-              <div class="register-field"><label for="register-name">Nome completo</label><input id="register-name" name="name" type="text" required minlength="3" maxlength="100" autocomplete="name" placeholder="Seu nome completo"></div>
+              <fieldset class="account-type-choice"><legend>Tipo de conta</legend>
+               <label><input type="radio" name="accountType" value="personal" checked><span><b>Pessoal</b><small>Organize seus próprios documentos.</small></span></label>
+               <label><input type="radio" name="accountType" value="organization"><span><b>Organização</b><small>Identifique os documentos com sua organização.</small></span></label>
+             </fieldset>
+             <div class="register-field" id="register-org-field" hidden><label for="register-org-name">Nome da organização</label><input id="register-org-name" name="organizationName" maxlength="120" minlength="2" placeholder="Nome da organização"></div>
+             <div class="register-field"><label for="register-name">Nome completo</label><input id="register-name" name="name" type="text" required minlength="3" maxlength="100" autocomplete="name" placeholder="Seu nome completo"></div>
               <div class="register-field"><label for="register-email">E-mail</label><input id="register-email" name="email" type="email" required maxlength="254" autocomplete="email" placeholder="seu@email.com"></div>
               <div class="register-field"><label for="register-phone">Telefone com DDD <span class="field-optional">(opcional)</span></label><input id="register-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(11) 90000-0000" maxlength="20"></div>
               <div class="register-field"><label for="register-password">Senha</label><input id="register-password" name="password" type="password" required minlength="12" maxlength="128" autocomplete="new-password" placeholder="Pelo menos 12 caracteres"></div>
@@ -67,7 +72,7 @@
   </section>
 
   <div id="app-page" class="app-page" hidden>
-    <header class="topbar"><div class="topbar-brand"><img src="assets/lk-brand-studio.svg" alt="Marca LK Studio" width="38" height="38"/><span>LK <b>MULTIMÍDIA</b><small>CENTRAL DE PRODUÇÃO</small></span></div><div class="topbar-actions"><span class="env-badge"><span class="dot"></span> CENTRAL TÉCNICA</span><button id="logout-btn" type="button" class="button logout">↪ Sair</button></div></header>
+    <header class="topbar"><div class="topbar-brand"><img src="assets/lk-brand-studio.svg" alt="Marca LK Studio" width="38" height="38"/><span>LK <b>MULTIMÍDIA</b><small>CENTRAL DE PRODUÇÃO</small></span></div><div class="topbar-actions"><span class="env-badge"><span class="dot"></span> CENTRAL TÉCNICA</span></div></header>
     <div class="workspace">
       <aside class="sidebar">
         <div class="sidebar-caption">ESPAÇO DE TRABALHO</div>
@@ -83,9 +88,12 @@
         <div class="sidebar-rule"></div>
         <div class="drafts-heading"><span>MEUS RASCUNHOS</span><button type="button" id="new-draft-side" title="Novo rider" aria-label="Novo rider">+</button></div>
         <div id="draft-list" class="draft-list"><p class="draft-empty">Nenhum rider salvo.</p></div>
-        <div class="sidebar-bottom"><span class="sidebar-bottom-icon">ⓘ</span><div><b>LK Multimídia</b><small>Documentos associados à sua conta.</small></div></div>
+        <div class="sidebar-profile-wrap"><button id="profile-trigger" type="button" class="profile-trigger" aria-expanded="false" aria-controls="profile-menu">
+           <span class="profile-avatar"><span class="profile-initials">U</span><img class="profile-photo" alt="" hidden></span>
+           <span class="profile-trigger-label"><strong id="profile-sidebar-name">Meu perfil</strong><small>Minha conta</small></span><span aria-hidden="true">⌃</span>
+          </button><div id="profile-menu" class="profile-menu" hidden><button type="button" id="profile-open">Meu perfil</button><button id="logout-btn" type="button">Sair da conta</button></div></div>
       </aside>
-      <main class="main-area">
+      <main class="main-area" id="main-area">
         <div class="main-topline"><div class="breadcrumb">CENTRAL TÉCNICA <span>/</span> RIDER TÉCNICO <span>/</span> <b id="breadcrumb-current">SOM</b></div><span class="last-saved" id="last-saved">Ainda não salvo</span></div>
         <div class="page-title-row"><div><div class="section-kicker">GERENCIADOR DE DOCUMENTOS</div><h1 id="page-title">Rider técnico de som</h1><p>Preencha os requisitos técnicos do evento e prepare seu documento para impressão.</p></div><button type="button" class="button outlined" id="new-rider">＋ Novo rider</button></div>
         <div class="editor-grid">
@@ -126,7 +134,15 @@
       </main>
     </div>
   </div>
-  <div id="print-root" aria-hidden="true"></div>
+  <div class="profile-modal-backdrop" id="profile-modal" hidden>
+     <section class="profile-modal" role="dialog" aria-modal="true" aria-labelledby="profile-heading">
+       <div class="profile-modal-title"><h2 id="profile-heading">Meu perfil</h2><button type="button" id="profile-close" aria-label="Fechar">×</button></div>
+       <div class="profile-summary"><span class="profile-avatar profile-avatar-large"><span class="profile-initials">U</span><img class="profile-photo" alt="" hidden></span><div><strong id="profile-name">Minha conta</strong><small id="profile-email"></small><small id="profile-plan"></small></div></div>
+       <label class="profile-photo-label" for="profile-photo-input">Escolher foto</label><input id="profile-photo-input" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+       <p class="profile-photo-hint">JPG, PNG ou WebP até 200 KB.</p>
+     </section>
+   </div>
+   <div id="print-root" aria-hidden="true"></div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="app.js?v=0.6.0" defer></script>
 </body>
