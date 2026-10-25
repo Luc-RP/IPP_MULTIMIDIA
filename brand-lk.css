@@ -318,3 +318,56 @@ button, a, input, select, textarea {transition:background-color .16s ease,border
 /* v0.4.2: acesso demonstrativo sempre consistente e fácil de testar */
 .demo-box .demo-fill{display:block;width:100%;margin-top:15px;border:1px solid #4b8d88;border-radius:6px;background:#f1faf8;color:#176b67;font-weight:800;font-size:11px;padding:11px 13px;box-shadow:none}
 .demo-box .demo-fill:hover{background:#e1f4ef;border-color:#237974;color:#134d4a}
+
+
+/* Login LK: apresentação fixa e painel de acesso independente.
+   A alternância de campos altera somente o próprio cartão. */
+@media (min-width: 761px) {
+  .auth-page:not([hidden]) {
+    display: block;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    padding: 0 clamp(22px, 3vw, 48px);
+    overflow: hidden;
+  }
+  .auth-shell {
+    height: 100%;
+    min-height: 0;
+    margin: 0 auto;
+    grid-template-rows: minmax(0, 1fr);
+    align-items: stretch;
+  }
+  .auth-intro {
+    min-height: 0;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .auth-intro::-webkit-scrollbar { display: none; }
+  .auth-card {
+    min-height: 0;
+    max-height: calc(100vh - 56px);
+    max-height: calc(100dvh - 56px);
+    align-self: center;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #a6bec0 transparent;
+  }
+}
+/* Em telas pequenas, preservar o fluxo vertical sem centralizar
+   todo o fundo novamente quando o formulário cresce. */
+@media (max-width: 760px) {
+  .auth-page:not([hidden]) {
+    align-items: flex-start;
+    justify-content: flex-start;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  .auth-shell { align-items: start; }
+  .auth-intro, .auth-card { align-self: start; }
+}
