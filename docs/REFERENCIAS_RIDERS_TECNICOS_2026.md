@@ -37,3 +37,28 @@ Orientações para o gerador de riders da LK Multimídia, considerando eventos p
 
 ## Segurança e operação
 Não mover o banco ou expor credenciais. Não copiar riders completos de artistas. Nenhuma modificação da API nem da Aiven foi necessária.
+
+
+## Revisão adicional da impressão A4 — 25/10/2026
+
+Arquivo enviado pelo responsável: Vigília do Jubileu, PDF A4 em duas páginas; o cabeçalho de fundo escuro toma altura desproporcional, a seção Formação da banda começa na folha 1 e a continuação aparece no começo da folha 2, com muito espaço vazio.
+
+A revisão v0.8.2 mantém tamanho do título principal em 22pt e subtítulo 10pt, mas compacta padding da faixa para 6mm 14mm 5.5mm, margens verticais do título, separador, nome do evento e corpo. Reduz margens e gaps de seções, campos e formação da banda. A margem inline entre instrumentos e vozes é sobrescrita para 2.4mm. A largura do print-root passa a 100% evitando overflow de 210mm.
+
+Preserva break-inside avoid em seções compactas e linhas de tabela, thead como cabeçalho repetível; tabelas longas continuam pagináveis. Simulação do documento enviado renderizada em WeasyPrint 68 com A4 em 1 página. Este teste não valida com fidelidade o motor Chrome/Brave usado na plataforma: saída real precisa de conferência pelo responsável.
+
+## Referências externas pesquisadas
+
+MusicNSW por Astrid Holz: modelo de input list com canal, fonte, microfone, posição e pedestal, stage plot e backline. https://pub-f64c2caae5db46d3aa29fd2161a9ed5c.r2.dev/tech-rider-stage-plot-template.pdf
+
+Molly Tuttle Advance 2025/2026: production rider e listas específicas para banda completa, trio e solo. https://mollytuttleadvance.com/downloads
+
+BMAD Technical Rider 2025: channel list com voz, teclados L/R, guitarra e percussão, conectores e observações. https://sounds.lu/bmad/technical-rider/
+
+LiveEPK: exemplos compactos de riders de duas páginas, com palco, canais e mixes em página própria. https://liveepk.com/tech-rider-examples
+
+BandsManager 2026: contatos, resumo, stage plot, patch, backline, monitoramento, FOH/energia e horários. https://bandsmanager.com/pt/blog/technical-rider-template-for-bands
+
+Improvised Music Company: trio essencial de stage plot, input list e backline. https://www.improvisedmusic.ie/supporting-musicians/resources-opportunities/what-is-a-technical-rider-and-why-do-i-need-one
+
+Recomendações de produto para decidir depois: modo de impressão resumido versus completo, mapa de palco, backline com responsável pelo fornecimento, documento de patch focado em FOH/monitores e quadro de logística/horários. Não copiar identidades visuais de terceiros.

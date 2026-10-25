@@ -26,7 +26,7 @@ test('editor mantém navegação mobile acessível e folhas sem overflow', () =>
 test('CSS versionado, formulário e arrays técnicos continuam no HTML', () => {
   const html=read('index.html'),js=read('app.js');
   for (const file of ['styles.css','brand-lk.css','app.js'])
-    assert.ok(html.includes(file+'?v=0.8.1'),file+' sem cache bust');
+    assert.ok(html.includes(file+'?v=0.8.2'),file+' sem cache bust');
   for (const id of ['login-form','register-form','rider-form','input-list','output-list',
     'technical-checklist','profile-trigger'])
     assert.ok(html.includes('id="'+id+'"'),id+' ausente');

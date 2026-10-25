@@ -50,8 +50,8 @@ function renderPrint(module, data){
 
 test('capa A4 compacta e regras que evitam cortes sem bloquear tabelas longas',()=>{
   const css=read('brand-lk.css');
-  assert.match(css, /LK PDF\/Impressão v0\.8\.1/);
-  assert.match(css, /\.print-cover\s*\{[^}]*padding:10mm 14mm 9mm/);
+  assert.match(css, /LK PDF\/Impressão v0\.8\.2/);
+  assert.match(css, /\.print-cover\s*\{[^}]*padding:6mm 14mm 5\.5mm/);
   assert.match(css, /\.print-cover h1\s*\{[^}]*font-size:22pt/);
   assert.match(css, /\.print-section--compact\s*\{break-inside:avoid/);
   assert.match(css, /\.print-section--long\s*\{break-inside:auto/);
@@ -111,5 +111,17 @@ test('tipos de eventos ampliados e campos opcionais integrados ao formulário',(
     assert.ok(html.includes('name="'+name+'"'),name);
   assert.match(js,/const productionPairs=/);
   for(const file of ['app.js','styles.css','brand-lk.css'])
-    assert.ok(html.includes(file+'?v=0.8.1'),file+' sem versionamento');
+    assert.ok(html.includes(file+'?v=0.8.2'),file+' sem versionamento');
+});
+
+test('impressão compacta mantém títulos legíveis e previne cortes',()=>{
+  const css=read('brand-lk.css');
+  assert.match(css, /\.print-cover h1\{font-size:22pt!important/);
+  assert.match(css, /\.print-cover h1\{[^}]*margin:2\.6mm 0 \.8mm/);
+  assert.match(css, /\.print-body\{display:block;padding:5\.5mm 14mm 8mm/);
+  assert.match(css, /\.print-section \.print-list \+ \.print-pairs\{margin-top:2\.4mm!important/);
+  assert.match(css, /#print-root\{display:block!important;width:100%!important/);
+  assert.match(css, /\.print-section--compact\{break-inside:avoid;page-break-inside:avoid/);
+  assert.match(css, /\.print-technical-table thead\{display:table-header-group/);
+  assert.match(css, /\.print-technical-table tr\{break-inside:avoid;page-break-inside:avoid/);
 });
