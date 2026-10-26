@@ -9,7 +9,7 @@
   <link rel="icon" href="assets/lk-brand-studio.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="styles.css?v=0.8.2" />
   <link rel="stylesheet" href="brand-lk.css?v=0.8.2" />
-  <link rel="stylesheet" href="stage-plot.css?v=0.9-preview" />
+  <link rel="stylesheet" href="stage-plot.css?v=0.9.1-preview" />
   <title>LK Multimídia | Central Técnica</title>
 </head>
 <body data-auth-loading="true">
@@ -193,8 +193,8 @@
             <label for="lk-plot-depth">Profundidade (m) <input id="lk-plot-depth" type="number" min="3" max="90" step="0.5"></label>
             <label for="lk-plot-view">Vista <select id="lk-plot-view"><option value="top">Superior</option><option value="front">Frontal</option><option value="left">Lateral esquerda</option><option value="right">Lateral direita</option></select></label>
           </div>
-          <div class="lk-plot-board"><svg id="lk-plot-canvas" role="img" aria-label="Mapa técnico interativo do ambiente" viewBox="0 0 760 540"></svg></div>
-          <div class="lk-plot-footline"><span>L · Esquerda / R · Direita (visão da plateia)</span><span>Posicionamento editável na vista superior</span></div>
+          <div class="lk-plot-board"><svg id="lk-plot-canvas" tabindex="0" role="img" aria-label="Mapa técnico interativo do ambiente" viewBox="0 0 760 540"></svg></div>
+          <div class="lk-plot-footline"><span>L · Esquerda / R · Direita (visão da plateia)</span><span>Arraste ou use setas do teclado para mover o item selecionado</span></div>
         </div>
         <aside class="lk-plot-side-right">
           <h3>Propriedades</h3><p id="lk-plot-pick-hint" class="lk-plot-note">Selecione um equipamento para editar.</p>
@@ -207,18 +207,19 @@
             <div class="lk-plot-extra lk-plot-prop"><label for="lk-plot-p-zone">Setor / área</label><input id="lk-plot-p-zone" maxlength="45"></div>
             <div class="lk-plot-extra lk-plot-prop"><label for="lk-plot-p-notes">Observações</label><textarea id="lk-plot-p-notes" maxlength="160" rows="3"></textarea></div>
             <div class="lk-plot-actions"><button class="lk-plot-action" type="button" id="lk-plot-copy">Duplicar</button><button class="lk-plot-action danger" type="button" id="lk-plot-delete">Excluir item</button></div>
+            <div class="lk-plot-move"><span>Reposicionar · 25 cm por toque</span><div class="lk-plot-move-grid"><button id="lk-plot-up" type="button" aria-label="Mover para cima">↑</button><button id="lk-plot-left" type="button" aria-label="Mover à esquerda">←</button><button id="lk-plot-down" type="button" aria-label="Mover para baixo">↓</button><button id="lk-plot-right" type="button" aria-label="Mover à direita">→</button></div></div>
           </div>
           <h3>Itens posicionados</h3><div id="lk-plot-object-list" class="lk-plot-list"></div>
           <h3>Resumo automático</h3><div id="lk-plot-summary" class="lk-plot-summary"></div>
         </aside>
       </div>
-      <div class="lk-plot-dialog-footer"><span id="lk-plot-total">0 grupos · 0 unidades</span><div class="lk-plot-actions"><button type="button" id="lk-plot-example" class="lk-plot-action">Carregar exemplo</button><button type="button" id="lk-plot-clear" class="lk-plot-action danger">Limpar mapa</button><button type="button" id="lk-plot-export" class="lk-plot-action">Exportar mapa JSON</button></div></div>
+      <div class="lk-plot-dialog-footer"><span id="lk-plot-total">0 grupos · 0 unidades</span><div class="lk-plot-actions"><button type="button" id="lk-plot-example" class="lk-plot-action">Carregar exemplo</button><button type="button" id="lk-plot-clear" class="lk-plot-action danger">Limpar mapa</button><button type="button" id="lk-plot-undo" class="lk-plot-action" disabled>↶ Desfazer</button><button type="button" id="lk-plot-redo" class="lk-plot-action" disabled>↷ Refazer</button><label class="lk-plot-action lk-plot-import-label" for="lk-plot-import">Importar JSON</label><input type="file" id="lk-plot-import" accept=".json,application/json" hidden><button type="button" id="lk-plot-export" class="lk-plot-action">Exportar JSON</button></div></div>
     </section>
   </div>
    <div id="print-root" aria-hidden="true"></div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="preview-bootstrap.js" defer></script>
-  <script src="stage-plot.js?v=0.9-preview" defer></script>
+  <script src="stage-plot.js?v=0.9.1-preview" defer></script>
   <script src="app.js?v=0.8.2" defer></script>
 </body>
 </html>
