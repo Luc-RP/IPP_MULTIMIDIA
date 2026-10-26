@@ -218,7 +218,7 @@
     result.instruments = module==='som' ? starterInstruments.map(x=>({...x})) : [];
     result.inputList=[];result.outputList=[];
     result.technicalChecklist=presetChecklist.map(x=>({...x}));
-    result.artwork='';result.module=module;return result;
+    result.artwork='';result.module=module;result.stagePlot=module==='som'?(window.LKStagePlot?.empty()||null):null;return result;
   }
   function capture() {
     const o={module:activeModule};new FormData(form).forEach((value,key)=>{if(typeof value==='string')o[key]=value;});
@@ -226,6 +226,7 @@
     o.inputList=readBuilder('input-list');
     o.outputList=readBuilder('output-list');
     o.technicalChecklist=readBuilder('technical-checklist');
+    if(activeModule==='som')o.stagePlot=window.LKStagePlot?.capture()||null;
     o.artwork=artworkData;return o;
   }
   function restore(data={}) {
@@ -235,6 +236,7 @@
     });
     loadInstruments(Array.isArray(data.instruments)?data.instruments:starterInstruments);
     loadBuilders(data);
+    window.LKStagePlot?.restore(activeModule==='som'?data.stagePlot:null);
     artworkData=data.artwork||'';$('artwork').value='';updateArtwork();
     if(!$('event-type').value)$('event-type').value='Evento';
     updateVigil();updateSummary();
@@ -367,6 +369,8 @@
       if(inputRows.length)html+=section(String(finalSectionNumber++).padStart(2,'0'),'Input List · Canais de entrada',printTechnicalTable(['CH','Fonte','Mic / DI','Pedestal','48V','Notas'],inputRows),true);
       if(outputRows.length)html+=section(String(finalSectionNumber++).padStart(2,'0'),'Output List · Saídas',printTechnicalTable(['Via','Destino','Tipo','Conexão','Notas'],outputRows),true);
       if(checklistRows.length)html+=section(String(finalSectionNumber++).padStart(2,'0'),'Checklist técnico',printTechnicalTable(['Estado','Etapa','Verificação'],checklistRows),true);
+      const plotMarkup=window.LKStagePlot?.printMarkup(d.stagePlot)||'';
+      if(plotMarkup)html+=section(String(finalSectionNumber++).padStart(2,'0'),'Mapa de palco',plotMarkup,true);
     } else if(activeModule==='luz') {
       html+=section('02','Iluminação',`<div class="print-pairs">${printedPair('Controladora',d.lightConsole)}${printedPair('Quantidade de refletores',d.lightQty)}${printedPair('Tipo principal',d.lightType)}${printedPair('Controle de sinal',d.lightControl)}</div>${printedNotes(d.lightNotes)}`);
     } else {
@@ -471,6 +475,18 @@
     $('show-register').disabled=false;
     $('login-form').querySelector('[type=submit]').disabled=true;
     $('register-form').querySelector('[type=submit]').disabled=true;
+    if(window.LK_PREVIEW_ONLY){
+      // GitHub Pages não oferece a API same-origin. É uma prévia visual SEM autenticação.
+      $('auth-page').hidden=true;$('app-page').hidden=false;
+      $('save-btn').disabled=true;$('save-btn').title='Prévia GitHub: salvamento na conta não disponível.';
+      $('last-saved').textContent='Prévia GitHub · não salvo';
+      $('profile-sidebar-name').textContent='Prévia visual';
+      $('logout-btn').disabled=true;
+      const banner=document.createElement('div');banner.className='lk-preview-banner';
+      banner.textContent='Prévia do GitHub Pages. Interface original da LK com mapa de palco integrado. O login e o salvamento na conta estão desativados neste ambiente; nenhum dado é enviado à API.';
+      $('main-area').insertBefore(banner,$('main-area').firstChild);
+      finishSessionBoot();return;
+    }
     fetch('/health',{method:'GET',cache:'no-store',credentials:'same-origin'})
       .then(async response=>{
         if(!response.ok)throw Error('API indisponível');
