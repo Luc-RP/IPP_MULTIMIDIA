@@ -91,7 +91,11 @@ test('vista superior e elevações compartilham geometria única',()=>{
  ]},new Set(['point']),()=> 'p');
  const o=scene.items[0],top=core.project(scene,o,'top'),front=core.project(scene,o,'front');
  const side=core.project(scene,o,'left'),right=core.project(scene,o,'right');
- assert.equal(top.x,front.x);
+ const frameTop=core.frame(scene,'top'),frameFront=core.frame(scene,'front');
+ const xWorldTop=(top.x-frameTop.x)/frameTop.scale;
+ const xWorldFront=(front.x-frameFront.x)/frameFront.scale;
+ assert.ok(Math.abs(xWorldTop-o.x)<1e-9);
+ assert.ok(Math.abs(xWorldFront-o.x)<1e-9);
  assert.notEqual(top.y,front.y);
  assert.ok(front.y<core.frame(scene,'front').y+scene.height*front.scale);
  assert.notEqual(side.x,right.x);
