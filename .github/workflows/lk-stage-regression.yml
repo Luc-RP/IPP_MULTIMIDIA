@@ -1,0 +1,24 @@
+name: LK stage and rider regression (GitHub Pages only)
+on:
+  push:
+    branches:
+      - gh-pages
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout gh-pages source
+        uses: actions/checkout@v4
+      - name: Configure Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax and regression tests
+        run: |
+          node --check app.js
+          node --check stage-core.js
+          node --check stage-plot.js
+          node --test tests/*.test.cjs
