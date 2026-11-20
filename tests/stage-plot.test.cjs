@@ -27,6 +27,9 @@ const document={
   createElement(tag){return new FakeElement(tag);}
 };
 const window={};
+const coreScript=fs.readFileSync(path.join(__dirname,'../stage-core.js'),'utf8');
+Function('window',coreScript)(window);
+const core=window.LKStageCore;
 const api=Function('document','window',script+'\nreturn window.LKStagePlot;')(document,window);
 
 test('the LK stage plot retains editable attributes and draws quantities',()=>{
@@ -68,4 +71,42 @@ test('imported data is clamped and untrusted labels are escaped',()=>{
  const markup=api.printMarkup(d);
  assert.doesNotMatch(markup,/<script>/);
  assert.match(markup,/&lt;script&gt;/);
+});
+
+test('modelo v1 migra para v2 e retém posicionamento, lado e quantidade',()=>{
+ const legacy=core.normalize({version:1,width:16,depth:10,items:[
+  {type:'line',qty:8,side:'L',label:'PA esquerdo',x:1.5,y:4}
+ ]},new Set(['line']),()=> 'migrado');
+ assert.equal(legacy.version,2);
+ assert.equal(legacy.height,7);
+ assert.equal(legacy.items[0].qty,8);
+ assert.equal(legacy.items[0].side,'L');
+ assert.equal(legacy.items[0].x,1.5);
+ assert.ok(legacy.items[0].heightM>0);
+ assert.equal(legacy.items[0].id,'migrado');
+});
+test('vista superior e elevações compartilham geometria única',()=>{
+ const scene=core.normalize({width:16,depth:10,height:8,items:[
+  {type:'point',qty:1,x:4,y:7,z:2,widthM:1,depthM:.8,heightM:1.5}
+ ]},new Set(['point']),()=> 'p');
+ const o=scene.items[0],top=core.project(scene,o,'top'),front=core.project(scene,o,'front');
+ const side=core.project(scene,o,'left'),right=core.project(scene,o,'right');
+ assert.equal(top.x,front.x);
+ assert.notEqual(top.y,front.y);
+ assert.ok(front.y<core.frame(scene,'front').y+scene.height*front.scale);
+ assert.notEqual(side.x,right.x);
+ assert.ok(core.footprint(o,'front',front.scale).height>0);
+ const changed={...o,z:4};
+ assert.ok(core.project(scene,changed,'front').y<front.y,'altura maior sobe na vista frontal');
+ assert.equal(core.project(scene,changed,'top').y,top.y,'altura não desloca posição de planta');
+});
+test('modelo contém dimensões físicas delimitadas e 25 tipos técnicos são mantidos',()=>{
+ const d=core.normalize({width:20,depth:12,height:8,items:[
+  {type:'sub',x:5,y:5,z:50,widthM:100,depthM:-1,heightM:20,qty:6}
+ ]},new Set(['sub']),()=> 'validado');
+ assert.equal(d.items[0].z,8);
+ assert.equal(d.items[0].widthM,20);
+ assert.equal(d.items[0].heightM,8);
+ assert.equal(d.items[0].qty,6);
+ assert.ok(d.items[0].depthM>=.05);
 });

@@ -1,0 +1,57 @@
+/* LK Multimídia | PDF neutro v0.10
+   O documento impresso pertence ao usuário. A marca da plataforma só fica na interface.
+   Branding próprio reservado a plano pago FUTURO: não liberar imagem via parâmetros do cliente.
+ */
+@media print{
+ @page{size:A4 portrait;margin:0}
+ html,body{background:#fff!important;color:#161616!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ #print-root{display:block!important;background:#fff!important;color:#161616!important;box-shadow:none!important}
+ #print-root .print-cover,
+ #print-root .print-cover--clean{
+    background:#fff!important;background-image:none!important;color:#141414!important;
+    border:0!important;border-bottom:1px solid #aaa!important;box-shadow:none!important;
+    padding:8mm 14mm 5mm!important;margin:0!important;
+    min-height:0!important;height:auto!important;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact
+ }
+ #print-root .print-cover:before,#print-root .print-cover:after,
+ #print-root .print-cover .print-line{display:none!important;content:none!important}
+ #print-root .print-cover *,
+ #print-root .print-cover h1,
+ #print-root .print-cover h2,
+ #print-root .print-cover .print-over,
+ #print-root .print-cover .print-event-name,
+ #print-root .print-cover small{
+    background:transparent!important;background-image:none!important;color:#171717!important;
+    text-shadow:none!important;box-shadow:none!important
+ }
+ #print-root .print-cover h1{font-size:19pt!important;letter-spacing:0!important;margin:2mm 0 1mm!important}
+ #print-root .print-cover h2{font-size:9pt!important;font-weight:600!important;letter-spacing:0!important}
+ #print-root .print-cover .print-over{font-size:7pt!important;font-weight:600!important;letter-spacing:.02em!important}
+ #print-root .print-cover .print-event-name{font-size:12pt!important;margin:3mm 0 1mm!important;font-weight:700!important}
+ #print-root .print-cover small{font-size:8pt!important}
+ #print-root .print-body{background:#fff!important;color:#161616!important;padding:6mm 14mm 9mm!important}
+ #print-root .print-section{background:#fff!important;color:#171717!important}
+ #print-root .print-section h3{color:#161616!important;border-bottom:1px solid #c9c9c9!important}
+ #print-root .print-section h3 span{color:#202020!important;background:#fff!important;
+   border:1px solid #999!important;font-weight:700!important}
+ #print-root .print-field small,#print-root .print-notes,#print-root .print-muted,
+ #print-root .print-item,#print-root .print-list{color:#202020!important}
+ #print-root .print-technical-table th{background:#f5f5f5!important;color:#171717!important;
+   border:1px solid #bdbdbd!important}
+ #print-root .print-technical-table td{color:#171717!important;background:#fff!important;
+   border-color:#c9c9c9!important}
+ #print-root .print-bottom{border-top:1px solid #bbb!important;color:#444!important;
+   background:transparent!important}
+ #print-root .print-bottom span{color:#444!important;background:transparent!important}
+ #print-root .lk-plot-print{background:#fff!important;color:#171717!important}
+ #print-root .lk-plot-print-drawing{background:#fff!important;border-color:#bdbdbd!important}
+ #print-root .lk-plot-print-legend span{background:#fff!important;color:#171717!important}
+ .lk-pdf-plan-hint{display:none!important}
+}
+.lk-pdf-plan-hint{background:#f6f9f9;border:1px solid #dce9e8;border-radius:5px;
+ padding:11px 14px;margin:9px 0 14px;color:#284348;display:flex;flex-direction:column;gap:4px}
+.lk-pdf-plan-hint strong{font-size:12px;font-weight:800}
+.lk-pdf-plan-hint small{font-size:11px;color:#61767a;line-height:1.45}
+.lk-pdf-plan-hint span{font-size:10px;font-weight:800;letter-spacing:.025em;
+ color:#66817e;align-self:flex-start;border:1px solid #cadcda;padding:4px 7px;border-radius:4px}

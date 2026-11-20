@@ -39,10 +39,11 @@ function renderPrint(module, data){
       imagem:{hero:'IMAGEM E VÍDEO',print:'RIDER DE IMAGEM'}
     },
     $:id=>{assert.equal(id,'print-root');return root;},
-    activeModule:module
+    activeModule:module,
+    window:{LKStagePlot:{printMarkup:()=>''}}
   };
   const fn=new Function('data','ctx',
-    'const {escapeHTML,eventDisplayName,eventPeriod,definitions,$,activeModule}=ctx;\n'
+    'const {escapeHTML,eventDisplayName,eventPeriod,definitions,$,activeModule,window}=ctx;\n'
     +fragment+'\ngeneratePrintMarkup(data);');
   fn(data,context);
   return root.innerHTML;
@@ -124,4 +125,18 @@ test('impressão compacta mantém títulos legíveis e previne cortes',()=>{
   assert.match(css, /\.print-section--compact\{break-inside:avoid;page-break-inside:avoid/);
   assert.match(css, /\.print-technical-table thead\{display:table-header-group/);
   assert.match(css, /\.print-technical-table tr\{break-inside:avoid;page-break-inside:avoid/);
+});
+
+test('PDF branco e independente da identidade de marca LK',()=>{
+ const html=read('index.html'),css=read('pdf-clean.css');
+ assert.ok(html.includes('pdf-clean.css?v=0.10-preview'));
+ assert.match(css, /#print-root \.print-cover/);
+ assert.match(css, /background:#fff!important/);
+ assert.match(css, /@page\{size:A4 portrait;margin:0\}/);
+ for(const module of ['som','luz','imagem']){
+  const output=renderPrint(module,mockRider({artwork:'data:image/png;base64,FAKE'}));
+  assert.ok(output.includes('print-cover--clean'));
+  assert.doesNotMatch(output,/LK MULTIMÍDIA|LK MULTIMIDIA|assets\/lk-mark|data:image\/png/);
+  assert.match(output,/RIDER TÉCNICO/);
+ }
 });

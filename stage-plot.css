@@ -75,3 +75,12 @@
 .lk-plot-import-label{display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
 #lk-plot-canvas:focus-visible{outline:3px solid #287f78;outline-offset:-3px}
 @media(max-width:760px){.lk-plot-move-grid button{min-height:46px}.lk-plot-dialog-footer{align-items:flex-start}.lk-plot-dialog-footer .lk-plot-actions{justify-content:flex-end}}
+
+/* Gate v0.10: referência espacial compartilhada entre planta, elevações e PDF. */
+.lk-plot-footprint{pointer-events:none}
+.lk-plot-object.is-selected .lk-plot-footprint{stroke:#d78d18;stroke-width:2.4}
+.lk-plot-tools label[for="lk-plot-height"] input{width:67px}
+.lk-plot-advanced .lk-plot-side-right .lk-plot-note{font-size:11px;line-height:1.45}
+@media print{
+ #print-root .lk-plot-print-drawing svg{background:#fff!important}
+}

@@ -9,7 +9,8 @@
   <link rel="icon" href="assets/lk-brand-studio.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="styles.css?v=0.8.2" />
   <link rel="stylesheet" href="brand-lk.css?v=0.8.2" />
-  <link rel="stylesheet" href="stage-plot.css?v=0.9.1-preview" />
+  <link rel="stylesheet" href="stage-plot.css?v=0.10-preview" />
+  <link rel="stylesheet" href="pdf-clean.css?v=0.10-preview" />
   <title>LK Multimídia | Central Técnica</title>
 </head>
 <body data-auth-loading="true">
@@ -105,7 +106,8 @@
                 <div class="form-section"><div class="form-section-title"><span class="section-num">01</span><div><b>Identificação do evento</b><small>Informações gerais do rider</small></div></div>
                   <div class="fields-grid two"><div class="field"><label for="event-type">Tipo de evento</label><select id="event-type" name="eventType"><option>Evento</option><optgroup label="Música e apresentações"><option>Show / concerto</option><option>Festival</option><option>Apresentação acústica</option><option>Teatro / espetáculo</option><option>Apresentação cultural</option></optgroup><optgroup label="Igrejas e conferências"><option>Culto / celebração</option><option>Vigília</option><option>Congresso</option><option>Conferência</option><option>Retiro / encontro</option></optgroup><optgroup label="Corporativos e educação"><option>Evento corporativo</option><option>Seminário</option><option>Workshop</option><option>Feira / exposição</option><option>Formatura</option></optgroup><optgroup label="Eventos sociais e produções"><option>Social</option><option>Casamento</option><option>Evento esportivo</option><option>Transmissão ao vivo</option><option>Gravação ao vivo</option></optgroup><option>Outro</option></select></div><div class="field"><label for="event-year">Ano do evento</label><select id="event-year" name="year"><option>2026</option><option>2027</option><option>2028</option><option>2029</option><option>2030</option></select></div></div>
                   <div class="fields-grid two vigil-years" id="vigil-years" hidden><div class="field"><label for="year-start">Ano inicial</label><select id="year-start" name="yearStart"><option>2026</option><option>2027</option><option>2028</option><option>2029</option><option>2030</option></select></div><div class="field"><label for="year-end">→ Ano final</label><select id="year-end" name="yearEnd"><option>2027</option><option>2028</option><option>2029</option><option>2030</option><option>2031</option></select></div></div>
-                  <div class="field"><label for="organization-name">Nome da organização <span class="optional">(opcional)</span></label><input id="organization-name" name="organizationName" maxlength="120" placeholder="Nome da empresa, grupo ou produção"></div><div class="field"><label for="event-name">Nome do evento <span class="req">*</span></label><input id="event-name" name="eventName" maxlength="130" placeholder="Ex.: Congresso Nacional" required></div>
+                  <div class="field"><label for="organization-name">Nome da organização <span class="optional">(opcional)</span></label><input id="organization-name" name="organizationName" maxlength="120" placeholder="Nome da empresa, grupo ou produção"></div>
+                  <div class="lk-pdf-plan-hint"><strong>PDF limpo e sem marca LK</strong><small>O documento será impresso em folha branca. Adicionar seu próprio logotipo será um recurso de plano pago, ainda indisponível nesta prévia.</small><span aria-label="Recurso futuro do plano pago">Logotipo personalizado · futuro plano pago</span></div><div class="field"><label for="event-name">Nome do evento <span class="req">*</span></label><input id="event-name" name="eventName" maxlength="130" placeholder="Ex.: Congresso Nacional" required></div>
                   <div class="fields-grid two"><div class="field"><label for="event-date">Data</label><input id="event-date" name="eventDate" type="date"></div><div class="field"><label for="event-location">Local</label><input id="event-location" name="location" maxlength="100" placeholder="Ex.: Centro de Convenções"></div></div>
                   <div class="production-optional">
                     <div class="production-optional-title"><strong>Informações da produção</strong><small>Opcional · útil para dimensionar a operação técnica</small></div>
@@ -191,10 +193,11 @@
             <label for="lk-plot-area">Área <select id="lk-plot-area"><option value="stage">Palco</option><option value="venue">Ambiente / salão</option></select></label>
             <label for="lk-plot-width">Largura (m) <input id="lk-plot-width" type="number" min="4" max="90" step="0.5"></label>
             <label for="lk-plot-depth">Profundidade (m) <input id="lk-plot-depth" type="number" min="3" max="90" step="0.5"></label>
+            <label for="lk-plot-height">Altura (m) <input id="lk-plot-height" type="number" min="3" max="30" step="0.5" title="Altura de referência do ambiente"></label>
             <label for="lk-plot-view">Vista <select id="lk-plot-view"><option value="top">Superior</option><option value="front">Frontal</option><option value="left">Lateral esquerda</option><option value="right">Lateral direita</option></select></label>
           </div>
           <div class="lk-plot-board"><svg id="lk-plot-canvas" tabindex="0" role="img" aria-label="Mapa técnico interativo do ambiente" viewBox="0 0 760 540"></svg></div>
-          <div class="lk-plot-footline"><span>L · Esquerda / R · Direita (visão da plateia)</span><span>Arraste ou use setas do teclado para mover o item selecionado</span></div>
+          <div class="lk-plot-footline"><span>L · Esquerda / R · Direita (visão da plateia)</span><span>Planta e elevações geradas a partir das mesmas coordenadas · alturas no Avançado</span></div>
         </div>
         <aside class="lk-plot-side-right">
           <h3>Propriedades</h3><p id="lk-plot-pick-hint" class="lk-plot-note">Selecione um equipamento para editar.</p>
@@ -203,6 +206,13 @@
             <div class="lk-plot-prop-row"><div class="lk-plot-prop"><label for="lk-plot-p-qty">Quantidade</label><input id="lk-plot-p-qty" type="number" min="1" max="99"></div><div class="lk-plot-prop"><label for="lk-plot-p-side">Lado</label><select id="lk-plot-p-side"><option value="none">Sem lado</option><option value="L">L · Esquerda</option><option value="R">R · Direita</option><option value="C">C · Centro</option></select></div></div>
             <div class="lk-plot-extra lk-plot-prop-row"><div class="lk-plot-prop"><label for="lk-plot-p-x">X (m)</label><input id="lk-plot-p-x" type="number" step="0.1"></div><div class="lk-plot-prop"><label for="lk-plot-p-y">Y (m)</label><input id="lk-plot-p-y" type="number" step="0.1"></div></div>
             <div class="lk-plot-extra lk-plot-prop"><label for="lk-plot-p-angle">Rotação (graus)</label><input id="lk-plot-p-angle" type="number" min="-360" max="360" step="15"></div>
+            <p class="lk-plot-extra lk-plot-note">Dimensões genéricas de referência, não medidas certificadas dos fabricantes. Edite conforme o equipamento real.</p>
+            <div class="lk-plot-extra lk-plot-prop"><label for="lk-plot-p-z">Altura da base / Z (m)</label><input id="lk-plot-p-z" type="number" min="0" max="30" step="0.1"></div>
+            <div class="lk-plot-extra lk-plot-prop-row">
+              <div class="lk-plot-prop"><label for="lk-plot-p-widthM">Largura (m)</label><input id="lk-plot-p-widthM" type="number" min="0.05" max="90" step="0.05"></div>
+              <div class="lk-plot-prop"><label for="lk-plot-p-depthM">Profund. (m)</label><input id="lk-plot-p-depthM" type="number" min="0.05" max="90" step="0.05"></div>
+            </div>
+            <div class="lk-plot-extra lk-plot-prop"><label for="lk-plot-p-heightM">Altura do conjunto (m)</label><input id="lk-plot-p-heightM" type="number" min="0.05" max="30" step="0.05"></div>
             <div class="lk-plot-extra lk-plot-prop"><label for="lk-plot-p-brand">Marca / modelo opcional</label><input id="lk-plot-p-brand" maxlength="65"></div>
             <div class="lk-plot-extra lk-plot-prop"><label for="lk-plot-p-zone">Setor / área</label><input id="lk-plot-p-zone" maxlength="45"></div>
             <div class="lk-plot-extra lk-plot-prop"><label for="lk-plot-p-notes">Observações</label><textarea id="lk-plot-p-notes" maxlength="160" rows="3"></textarea></div>
@@ -219,7 +229,8 @@
    <div id="print-root" aria-hidden="true"></div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="preview-bootstrap.js" defer></script>
-  <script src="stage-plot.js?v=0.9.1-preview" defer></script>
+  <script src="stage-core.js?v=0.10-preview" defer></script>
+  <script src="stage-plot.js?v=0.10-preview" defer></script>
   <script src="app.js?v=0.8.2" defer></script>
 </body>
 </html>
